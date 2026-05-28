@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מנהל משימות - monday.com</title>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Figtree', 'Roboto', sans-serif;
+            background: #f6f7fb;
+            color: #323338;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Poppins', 'Roboto', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #323338;
+            margin-bottom: 24px;
+        }
+
+        /* API Token Section */
+        .api-section {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px -4px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+
+        .api-section h2 {
+            font-family: 'Poppins', 'Roboto', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #323338;
+            margin-bottom: 12px;
+        }
+
+        .instructions {
+            background: #cce5ff;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-right: 4px solid #0073ea;
+        }
+
+        .instructions p {
+            font-size: 14px;
+            color: #323338;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .instructions ol {
+            margin-right: 20px;
+            font-size: 14px;
+            color: #323338;
+            line-height: 1.8;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #323338;
+            margin-bottom: 8px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #c3c6d4;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Figtree', 'Roboto', sans-serif;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #0073ea;
+        }
+
+        .input-group input::placeholder {
+            color: #676879;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Figtree', 'Roboto', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #0073ea;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #0060b9;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: #c4c4c4;
+            color: #323338;
+        }
+
+        .btn-secondary:hover {
+            background: #b0b0b0;
+        }
+
+        .btn-success {
+            background: #00854d;
+            color: #ffffff;
+        }
+
+        .btn-success:hover {
+            background: #006b3d;
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Main Action Button */
+        .action-section {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px -4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #d0d4e4;
+        }
+
+        .modal-header h3 {
+            font-family: 'Poppins', 'Roboto', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #323338;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 24px;
+            border-top: 1px solid #d0d4e4;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .status-message.success {
+            background: #e6f4ea;
+            color: #00854d;
+            border-right: 4px solid #00854d;
+        }
+
+        .status-message.error {
+            background: #fce8ec;
+            color: #d83a52;
+            border-right: 4px solid #d83a52;
+        }
+
+        .status-message.info {
+            background: #cce5ff;
+            color: #0073ea;
+            border-right: 4px solid #0073ea;
+        }
+
+        .status-message.active {
+            display: block;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Required field indicator */
+        .required {
+            color: #d83a52;
+            margin-right: 4px;
+        }
+
+        /* Stats Section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px -4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0073ea;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .label {
+            font-size: 14px;
+            color: #676879;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .modal {
+                max-width: 100%;
+            }
+
+            .modal-footer {
+                flex-direction: column-reverse;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Disabled state */
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        select option:disabled {
+            color: #c4c4c4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Status Messages -->
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- API Token Section (Hidden) -->
+        <div class="api-section" style="display: none;">
+            <div class="input-group">
+                <input type="password" id="apiToken" placeholder="API Token">
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats" id="statsSection" style="display: grid;">
+            <div class="stat-card">
+                <div class="number" id="projectCount">0</div>
+                <div class="label">פרויקטים זמינים</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="userCount">0</div>
+                <div class="label">משתמשים במערכת</div>
+            </div>
+        </div>
+
+        <!-- Main Action Section -->
+        <div class="action-section">
+            <button class="btn btn-primary btn-large" onclick="openModal()" id="addTaskBtn">
+                <span>➕</span>
+                <span>הוסף משימה חדשה</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>הוספת משימה חדשה</h3>
+            </div>
+            <div class="modal-body">
+                <div id="modalStatus" class="status-message"></div>
+                
+                <div class="input-group">
+                    <label for="taskName"><span class="required">*</span>שם המשימה</label>
+                    <input type="text" id="taskName" placeholder="הזן שם משימה">
+                </div>
+
+                <div class="input-group">
+                    <label for="projectSelect"><span class="required">*</span>בחר פרויקט</label>
+                    <select id="projectSelect">
+                        <option value="" disabled selected>בחר פרויקט מהרשימה</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="ownerSelect">בחר אדם אחראי (אופציונלי)</label>
+                    <select id="ownerSelect">
+                        <option value="">ללא אחראי</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+                <button class="btn btn-success" onclick="createTask()" id="confirmBtn">אישור</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            MAIN_BOARD_ID: 5095918038,
+            SUBITEMS_BOARD_ID: 5096158934,
+            ACCOUNT_ID: 34997510,
+            API_ENDPOINT: 'https://api.monday.com/v2',
+            STORAGE_KEY: 'monday_api_token'
+        };
+
+        // State
+        let projects = [];
+        let users = [];
+        let apiToken = '';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTokenFromStorage();
+            // Auto-load data on startup
+            if (apiToken) {
+                loadData();
+            }
+        });
+
+        // Token Management
+        function loadTokenFromStorage() {
+            const stored = localStorage.getItem(CONFIG.STORAGE_KEY);
+            if (stored) {
+                apiToken = stored;
+                document.getElementById('apiToken').value = stored;
+                showStatus('טוקן נטען מהזיכרון המקומי', 'info');
+                loadData();
+            }
+        }
+
+        function saveToken() {
+            const tokenInput = document.getElementById('apiToken');
+            const token = tokenInput.value.trim();
+            
+            if (!token) {
+                showStatus('נא להזין API Token', 'error');
+                return;
+            }
+
+            apiToken = token;
+            localStorage.setItem(CONFIG.STORAGE_KEY, token);
+            showStatus('הטוקן נשמר בהצלחה!', 'success');
+            
+            // Auto-load data after saving token
+            setTimeout(() => loadData(), 500);
+        }
+
+        // API Functions
+        async function makeGraphQLRequest(query, variables = {}) {
+            if (!apiToken) {
+                throw new Error('API Token חסר. נא להזין טוקן תחילה.');
+            }
+
+            const response = await fetch(CONFIG.API_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': apiToken,
+                    'API-Version': '2024-01'
+                },
+                body: JSON.stringify({ query, variables })
+            });
+
+            const data = await response.json();
+
+            if (data.errors) {
+                throw new Error(data.errors[0].message);
+            }
+
+            if (!response.ok) {
+                throw new Error(`שגיאת API: ${response.status}`);
+            }
+
+            return data.data;
+        }
+
+        async function loadData() {
+            if (!apiToken) {
+                showStatus('נא להזין ולשמור API Token תחילה', 'error');
+                return;
+            }
+
+            showStatus('טוען נתונים...', 'info');
+            
+            try {
+                // Load projects and users in parallel
+                const [projectsData, usersData] = await Promise.all([
+                    loadProjects(),
+                    loadUsers()
+                ]);
+
+                showStatus('הנתונים נטענו בהצלחה!', 'success');
+                document.getElementById('addTaskBtn').disabled = false;
+                document.getElementById('statsSection').style.display = 'grid';
+                
+                // Update stats
+                document.getElementById('projectCount').textContent = projects.length;
+                document.getElementById('userCount').textContent = users.length;
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showStatus(`שגיאה בטעינת נתונים: ${error.message}`, 'error');
+                document.getElementById('addTaskBtn').disabled = true;
+            }
+        }
+
+        async function loadProjects() {
+            const query = `
+                query {
+                    boards(ids: ${CONFIG.MAIN_BOARD_ID}) {
+                        items_page(limit: 500) {
+                            items {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+            `;
+
+            const data = await makeGraphQLRequest(query);
+            projects = data.boards[0].items_page.items;
+            
+            // Populate dropdown
+            const select = document.getElementById('projectSelect');
+            select.innerHTML = '<option value="" disabled selected>בחר פרויקט מהרשימה</option>';
+            
+            projects.forEach(project => {
+                const option = document.createElement('option');
+                option.value = project.id;
+                option.textContent = project.name;
+                select.appendChild(option);
+            });
+
+            return projects;
+        }
+
+        async function loadUsers() {
+            const query = `
+                query {
+                    users {
+                        id
+                        name
+                        email
+                    }
+                }
+            `;
+
+            const data = await makeGraphQLRequest(query);
+            users = data.users;
+            
+            // Populate dropdown
+            const select = document.getElementById('ownerSelect');
+            select.innerHTML = '<option value="">ללא אחראי</option>';
+            
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.name;
+                select.appendChild(option);
+            });
+
+            return users;
+        }
+
+        async function createTask() {
+            const taskName = document.getElementById('taskName').value.trim();
+            const projectId = document.getElementById('projectSelect').value;
+            const ownerId = document.getElementById('ownerSelect').value;
+
+            // Validation
+            if (!taskName) {
+                showModalStatus('נא להזין שם משימה', 'error');
+                return;
+            }
+
+            if (!projectId) {
+                showModalStatus('נא לבחור פרויקט', 'error');
+                return;
+            }
+
+            // Disable button and show loading
+            const confirmBtn = document.getElementById('confirmBtn');
+            const originalText = confirmBtn.innerHTML;
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<span class="spinner"></span> יוצר משימה...';
+
+            try {
+                // Create subitem
+                const createMutation = `
+                    mutation {
+                        create_subitem(
+                            parent_item_id: ${projectId},
+                            item_name: "${taskName.replace(/"/g, '\\"')}"
+                        ) {
+                            id
+                        }
+                    }
+                `;
+
+                const createData = await makeGraphQLRequest(createMutation);
+                const subitemId = createData.create_subitem.id;
+
+                // Update owner if selected
+                if (ownerId) {
+                    const columnValues = JSON.stringify({
+                        person: { personsAndTeams: [{ id: parseInt(ownerId), kind: "person" }] }
+                    });
+                    
+                    const updateMutation = `
+                        mutation {
+                            change_multiple_column_values(
+                                item_id: ${subitemId},
+                                board_id: ${CONFIG.SUBITEMS_BOARD_ID},
+                                column_values: ${JSON.stringify(columnValues)}
+                            ) {
+                                id
+                            }
+                        }
+                    `;
+
+                    await makeGraphQLRequest(updateMutation);
+                }
+
+                // Success!
+                showStatus('המשימה נוספה בהצלחה! ✓', 'success');
+                closeModal();
+                clearForm();
+
+            } catch (error) {
+                console.error('Error creating task:', error);
+                showModalStatus(`שגיאה ביצירת משימה: ${error.message}`, 'error');
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = originalText;
+            }
+        }
+
+        // Modal Functions
+        function openModal() {
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('taskName').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            hideModalStatus();
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target === document.getElementById('modalOverlay')) {
+                closeModal();
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('taskName').value = '';
+            document.getElementById('projectSelect').value = '';
+            document.getElementById('ownerSelect').value = '';
+        }
+
+        // Status Message Functions
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type} active`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusEl.classList.remove('active');
+            }, 5000);
+        }
+
+        function showModalStatus(message, type = 'info') {
+            const statusEl = document.getElementById('modalStatus');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type} active`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusEl.classList.remove('active');
+            }, 5000);
+        }
+
+        function hideModalStatus() {
+            document.getElementById('modalStatus').classList.remove('active');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // ESC to close modal
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+            
+            // Enter to submit form when modal is open
+            if (event.key === 'Enter' && document.getElementById('modalOverlay').classList.contains('active')) {
+                event.preventDefault();
+                createTask();
+            }
+        });
+    </script>
+</body>
+</html>

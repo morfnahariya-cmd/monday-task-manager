@@ -463,31 +463,32 @@
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = 'he-IL'; // הגדרה לשפה העברית
+    recognition.lang = 'he-IL';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
     const micBtn = document.getElementById('micBtn');
     const taskInput = document.getElementById('taskName');
 
-    micBtn.innerText = "🔴"; // משתנה לאדום בזמן הקלטה
+    micBtn.innerText = "🔴"; // עובר לעיגול אדום בזמן הקלטה
 
     recognition.onresult = function(event) {
         const speechText = event.results[0][0].transcript;
-        taskInput.value = speechText; // מכניס את הטקסט לשדה המשימה
-        micBtn.innerText = "🔊";
+        taskInput.value = speechText;
+        micBtn.innerText = "🔊"; // חוזר לאייקון הרמקול החדש
     };
 
     recognition.onerror = function(event) {
         console.error("שגיאה בזיהוי קולי:", event.error);
-        micBtn.innerText = "🔊";
+        micBtn.innerText = "🔊"; // חוזר לאייקון הרמקול החדש
     };
 
     recognition.onend = function() {
-        micBtn.innerText = "🔊";
+        micBtn.innerText = "🔊"; // חוזר לאייקון הרמקול החדש
     };
 
     recognition.start();
+}
 }
 </script>
 

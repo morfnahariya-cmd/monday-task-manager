@@ -454,8 +454,7 @@
             btn.textContent = 'הוסף משימה';
             setTimeout(() => { msg.style.display = 'none'; }, 4000);
         }
-    });
-    function toggleSpeechRecognition() {
+    });function toggleSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
         alert("הדפדפן שלך לא תומך בהקלטה קולית. נסה להשתמש ב-Chrome או Safari.");
@@ -470,21 +469,21 @@
     const micBtn = document.getElementById('micBtn');
     const taskInput = document.getElementById('taskName');
 
-    micBtn.innerText = "🔴"; // עובר לעיגול אדום בזמן הקלטה
+    micBtn.innerText = "🔴";
 
     recognition.onresult = function(event) {
         const speechText = event.results[0][0].transcript;
         taskInput.value = speechText;
-        micBtn.innerText = "🔊"; // חוזר לאייקון הרמקול החדש
+        micBtn.innerText = "🔊";
     };
 
     recognition.onerror = function(event) {
         console.error("שגיאה בזיהוי קולי:", event.error);
-        micBtn.innerText = "🔊"; // חוזר לאייקון הרמקול החדש
+        micBtn.innerText = "🔊";
     };
 
     recognition.onend = function() {
-        micBtn.innerText = "🔊"; // חוזר לאייקון הרמקול החדש
+        micBtn.innerText = "🔊";
     };
 
     recognition.start();

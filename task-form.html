@@ -150,7 +150,7 @@
     const TASKS_BOARD_ID = "5105855992";
     const PROJECTS_BOARD_ID = "5097106853";
     
-    // מפתח ה-API הראשי של הקהילה/החשבון
+    // מפתח ה-API הראשי
     const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM0OTk3NTEwLCJyZ24iOiJldWMxIn0.7lm65-gCEmkWPtzTxBpsnzZOf5NEbircT8FiLEnMwx0";
 
     // טעינת נתונים ראשוניים בטעינת העמוד
@@ -193,7 +193,7 @@
                 select.appendChild(opt);
             });
         } catch (err) {
-            select.innerHTML = '<option value="">שגיאה שטעינת פרויקטים</option>';
+            select.innerHTML = '<option value="">שגיאה בטעינת פרויקטים</option>';
         }
     }
 
@@ -245,10 +245,10 @@
         // בניית ערכי העמודות
         const columnValues = {};
         
-       if (projectId) {
-    // חיבור ללוח הפרויקטים עם המזהה המדויק שלך
-    columnValues["board_relation_mm84qg4p"] = { item_ids: [parseInt(projectId)] };
-}
+        if (projectId) {
+            // חיבור מדויק ללוח הפרויקטים עם המזהה שלך
+            columnValues["board_relation_mm84qg4p"] = { item_ids: [parseInt(projectId)] };
+        }
         if (personId) {
             columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
         }
@@ -285,7 +285,7 @@
                 throw new Error(result.errors[0].message);
             }
 
-            msg.textContent = 'הערך נוסף בהצלחה למאנדיי!';
+            msg.textContent = 'המשימה נוספה בהצלחה למאנדיי!';
             msg.className = 'message success';
             msg.style.display = 'block';
             

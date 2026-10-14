@@ -165,7 +165,6 @@
             </select>
         </div>
 
-        <!-- שדה חובה: מבקש המשימה -->
         <div class="form-group">
             <label class="required" for="createdBySelect">מבקש המשימה</label>
             <select id="createdBySelect" required>
@@ -256,7 +255,9 @@
                 key === 'plans' ? 'btnPlans' :
                 key === 'projects' ? 'btnProjects' : 'btnInspection'
             );
-            btnEl.classList.toggle('active', key === boardKey);
+            if (btnEl) {
+                btnEl.classList.toggle('active', key === boardKey);
+            }
         });
 
         loadProjectsForCurrentBoard();
@@ -264,6 +265,7 @@
 
     async function loadProjectsForCurrentBoard() {
         const select = document.getElementById('projectSelect');
+        if (!select) return;
         select.innerHTML = '<option value="">טוען פרויקטים...</option>';
         
         const config = BOARDS_CONFIG[currentBoardKey];
@@ -287,6 +289,12 @@
                 body: JSON.stringify({ query })
             });
             const data = await res.json();
+            
+            if (!data.data || !data.data.boards || data.data.boards.length === 0) {
+                select.innerHTML = '<option value="">אין פרויקטים זמינים</option>';
+                return;
+            }
+
             const items = data.data.boards[0].items_page.items;
             
             select.innerHTML = '<option value="">בחר פרויקט...</option>';
@@ -296,3 +304,33 @@
                 opt.textContent = item.name;
                 select.appendChild(opt);
             });
+        } catch (err) {
+            console.error("Error loading projects:", err);
+            select.innerHTML = '<option value="">שגיאה בטעינת פרויקטים</option>';
+        }
+    }
+
+    async function loadUsers() {
+        const personSelect = document.getElementById('personSelect');
+        const createdBySelect = document.getElementById('createdBySelect');
+        if (!personSelect || !createdBySelect) return;
+
+        const query = `{ users { id name } }`;
+
+        try {
+            const res = await fetch("https://api.monday.com/v2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": MONDAY_API_KEY
+                },
+                body: JSON.stringify({ query })
+            });
+            const data = await res.json();
+            
+            if (!data.data || !data.data.users) return;
+            
+            const users = data.data.users;
+
+            personSelect.innerHTML = '<option value="">בחר אחראי/ת...</option>';
+            createdBySelect.

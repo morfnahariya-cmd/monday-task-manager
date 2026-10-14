@@ -153,11 +153,11 @@
 
     <form id="taskForm">
         
-       <div class="form-group">
+     <div class="form-group">
     <label class="required" for="taskName">מה המשימה?</label>
     <div style="position: relative;">
-        <input type="text" id="taskName" required placeholder="הקלד תאור משימה..." style="padding-left: 45px;">
-        <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 20px; padding: 0; color: #555;">🔊</button>
+        <input type="text" id="taskName" required placeholder="הקלד תאור משימה..." style="padding-left: 40px;">
+        <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px;">🔊</button>
     </div>
 </div>
 
@@ -454,7 +454,8 @@
             btn.textContent = 'הוסף משימה';
             setTimeout(() => { msg.style.display = 'none'; }, 4000);
         }
-    });function toggleSpeechRecognition() {
+    });
+    function toggleSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
         alert("הדפדפן שלך לא תומך בהקלטה קולית. נסה להשתמש ב-Chrome או Safari.");
@@ -487,6 +488,7 @@
     };
 
     recognition.start();
+}
 }
 }
 </script>

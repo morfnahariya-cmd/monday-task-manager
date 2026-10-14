@@ -156,8 +156,8 @@
     <div class="form-group">
     <label class="required" for="taskName">מה המשימה?</label>
     <div style="position: relative;">
-        <input type="text" id="taskName" required placeholder="הקלד תיאור משימה..." style="padding-left: 45px;">
-        <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 20px; padding: 0; color: #555;">🔊</button>
+        <input type="text" id="taskName" required placeholder="הקלד תיאור משימה..." style="padding-left: 40px;">
+        <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0;">🎤</button>
     </div>
 </div>
 
@@ -475,22 +475,19 @@
     recognition.onresult = function(event) {
         const speechText = event.results[0][0].transcript;
         taskInput.value = speechText; // מכניס את הטקסט לשדה המשימה
-        micBtn.innerText = "🔊";
+        micBtn.innerText = "🎤";
     };
 
     recognition.onerror = function(event) {
         console.error("שגיאה בזיהוי קולי:", event.error);
-        micBtn.innerText = "🔊";
+        micBtn.innerText = "🎤";
     };
 
     recognition.onend = function() {
-        micBtn.innerText = "🔊";
+        micBtn.innerText = "🎤";
     };
 
     recognition.start();
-}
-}
-}
 }
 </script>
 

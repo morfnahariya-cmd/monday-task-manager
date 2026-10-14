@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>הוספת משימה - ניהול פרויקטים</title>
+    <title>הוספת משימה - מאנדיי</title>
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -105,6 +105,14 @@
     <form id="taskForm">
         
         <div class="form-group">
+            <label class="required" for="boardSelect">לאיזה לוח לשלוח?</label>
+            <select id="boardSelect" required>
+                <option value="projects">ניהול פרוייקטים</option>
+                <option value="inspection">פיקוח על הבניה</option>
+            </select>
+        </div>
+
+        <div class="form-group">
             <label class="required" for="taskName">מה המשימה?</label>
             <input type="text" id="taskName" required placeholder="הקלד תיאור משימה...">
         </div>
@@ -146,9 +154,18 @@
 </div>
 
 <script>
-    const TASKS_BOARD_ID = "5105855992";
-    const PROJECTS_BOARD_ID = "5097106853";
     const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM0OTk3NTEwLCJyZ24iOiJldWMxIn0.7lm65-gCEmkWPtzTxBpsnzZOf5NEbircT8FiLEnMwx0";
+
+    const BOARDS_CONFIG = {
+        projects: {
+            boardId: "5105855992",
+            projectColumnId: "board_relation_mm84qg4p"
+        },
+        inspection: {
+            boardId: "5105969083",
+            projectColumnId: "board_relation_mm84ngk1"
+        }
+    };
 
     window.addEventListener('DOMContentLoaded', () => {
         loadProjects();
@@ -158,7 +175,7 @@
     async function loadProjects() {
         const select = document.getElementById('projectSelect');
         const query = `{
-            boards(ids: [${PROJECTS_BOARD_ID}]) {
+            boards(ids: [5097106853]) {
                 items_page {
                     items { id name }
                 }
@@ -226,6 +243,9 @@
         btn.disabled = true;
         btn.textContent = 'שולח משימה...';
 
+        const boardChoice = document.getElementById('boardSelect').value;
+        const currentConfig = BOARDS_CONFIG[boardChoice];
+
         const taskName = document.getElementById('taskName').value;
         const projectId = document.getElementById('projectSelect').value;
         const personId = document.getElementById('personSelect').value;
@@ -235,7 +255,7 @@
         const columnValues = {};
         
         if (projectId) {
-            columnValues["board_relation_mm84qg4p"] = { item_ids: [parseInt(projectId)] };
+            columnValues[currentConfig.projectColumnId] = { item_ids: [parseInt(projectId)] };
         }
         if (personId) {
             columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
@@ -249,7 +269,7 @@
 
         const query = `mutation {
             create_item (
-                board_id: ${TASKS_BOARD_ID},
+                board_id: ${currentConfig.boardId},
                 item_name: "${taskName.replace(/"/g, '\\"')}",
                 column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
             ) {
@@ -286,4 +306,11 @@
             msg.style.display = 'block';
         } finally {
             btn.disabled = false;
-            btn
+            btn.textContent = 'הוסף משימה';
+            setTimeout(() => { msg.style.display = 'none'; }, 4000);
+        }
+    });
+</script>
+
+</body>
+</html>

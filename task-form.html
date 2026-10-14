@@ -475,16 +475,16 @@
     recognition.onresult = function(event) {
         const speechText = event.results[0][0].transcript;
         taskInput.value = speechText; // מכניס את הטקסט לשדה המשימה
-        micBtn.innerText = "🎤";
+        micBtn.innerText = "🔊";
     };
 
     recognition.onerror = function(event) {
         console.error("שגיאה בזיהוי קולי:", event.error);
-        micBtn.innerText = "🎤";
+        micBtn.innerText = "🔊";
     };
 
     recognition.onend = function() {
-        micBtn.innerText = "🎤";
+        micBtn.innerText = "🔊";
     };
 
     recognition.start();

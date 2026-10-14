@@ -142,12 +142,12 @@
 </head>
 <body>
 
-    <!-- כפתורי הניווט הראשיים מחוץ לכרטיסייה ובשורה אחת -->
+    <!-- כפתורי הניווט הראשיים בסדר החדש: היתרי בניה, תכניות, ניהול פרויקטים, פיקוח על הבניה -->
     <div class="tabs-wrapper">
-        <button type="button" class="tab-btn active" id="btnProjects" onclick="switchBoard('projects')">ניהול פרוייקטים</button>
-        <button type="button" class="tab-btn" id="btnInspection" onclick="switchBoard('inspection')">פיקוח על הבניה</button>
-        <button type="button" class="tab-btn" id="btnPermits" onclick="switchBoard('permits')">היתרי בניה</button>
+        <button type="button" class="tab-btn active" id="btnPermits" onclick="switchBoard('permits')">היתרי בניה</button>
         <button type="button" class="tab-btn" id="btnPlans" onclick="switchBoard('plans')">תכניות</button>
+        <button type="button" class="tab-btn" id="btnProjects" onclick="switchBoard('projects')">ניהול פרוייקטים</button>
+        <button type="button" class="tab-btn" id="btnInspection" onclick="switchBoard('inspection')">פיקוח על הבניה</button>
     </div>
 
 <div class="form-container">
@@ -230,7 +230,8 @@
         }
     };
 
-    let currentBoardKey = 'projects';
+    // מתחילים בברירת מחדל על "היתרי בניה"
+    let currentBoardKey = 'permits';
 
     window.addEventListener('DOMContentLoaded', () => {
         loadProjectsForCurrentBoard();

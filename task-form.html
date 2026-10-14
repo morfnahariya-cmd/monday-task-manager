@@ -241,11 +241,9 @@
             columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
         }
         if (dueDate) {
-            // פורמט תאריך תקני
             columnValues["date4"] = { date: dueDate };
         }
         if (priority) {
-            // שליחה מדויקת לפי התווית בלוח
             columnValues["color_mm83ak5q"] = { label: priority };
         }
 
@@ -288,11 +286,4 @@
             msg.style.display = 'block';
         } finally {
             btn.disabled = false;
-            btn.textContent = 'הוסף משימה';
-            setTimeout(() => { msg.style.display = 'none'; }, 4000);
-        }
-    });
-</script>
-
-</body>
-</html>
+            btn

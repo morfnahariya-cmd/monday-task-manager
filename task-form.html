@@ -245,10 +245,10 @@
         // בניית ערכי העמודות
         const columnValues = {};
         
-        if (projectId) {
-            // חיבור ללוח הפרויקטים
-            columnValues["board_relation"] = { item_ids: [parseInt(projectId)] };
-        }
+       if (projectId) {
+    // חיבור ללוח הפרויקטים עם המזהה המדויק שלך
+    columnValues["board_relation_mm84qg4p"] = { item_ids: [parseInt(projectId)] };
+}
         if (personId) {
             columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
         }

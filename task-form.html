@@ -478,13 +478,14 @@
         micBtn.innerText = "🔊";
     };
 
-    recognition.onerror = function(event) {
-        console.error("שגיאה בזיהוי קולי:", event.error);
-        micBtn.innerText = "🔊";
+   recognition.onstart = function() {
+        const micBtn = document.getElementById('micBtn');
+        micBtn.innerText = "🔴"; // הופך לאדום מהבהב בזמן הקלטה
     };
 
     recognition.onend = function() {
-        micBtn.innerText = "🔊";
+        const micBtn = document.getElementById('micBtn');
+        micBtn.innerText = "🔊"; // חוזר לרמקול בסיום
     };
 
     recognition.start();

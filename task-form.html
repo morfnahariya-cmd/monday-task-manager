@@ -16,7 +16,7 @@
             min-height: 100vh;
             box-sizing: border-box;
         }
-        /* כפתורים עליונים מחוץ לכרטיסייה, בשורה אחת */
+        /* כפתורים עליונים מחוץ לכרטיסייה, בשורה אחת ולחיצים לחלוטין */
         .tabs-wrapper {
             display: flex;
             gap: 10px;
@@ -25,6 +25,8 @@
             max-width: 650px;
             justify-content: center;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
         }
         .tab-btn {
             background-color: #ffffff;
@@ -55,6 +57,8 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             width: 100%;
             max-width: 500px;
+            position: relative;
+            z-index: 1;
         }
         h2 {
             color: #323338;
@@ -189,7 +193,6 @@
 <script>
     const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM0OTk3NTEwLCJyZ24iOiJldWMxIn0.7lm65-gCEmkWPtzTxBpsnzZOf5NEbircT8FiLEnMwx0";
 
-    // הגדרות מלאות לכל 4 הלוחות
     const BOARDS_CONFIG = {
         projects: {
             type: "item", 
@@ -228,11 +231,9 @@
         loadUsers();
     });
 
-    // מעבר בין הלוחות בלחיצה על הכפתורים
     function switchBoard(boardKey) {
         currentBoardKey = boardKey;
         
-        // עדכון עיצוב הכפתורים הפעילים
         ['projects', 'inspection', 'permits', 'plans'].forEach(key => {
             const btnEl = document.getElementById(
                 key === 'projects' ? 'btnProjects' :
@@ -242,11 +243,9 @@
             btnEl.classList.toggle('active', key === boardKey);
         });
 
-        // טעינת הפרויקטים המתאימים ללוח הנבחר
         loadProjectsForCurrentBoard();
     }
 
-    // טעינת רשימת הפרויקטים בהתאם לסוג הלוח
     async function loadProjectsForCurrentBoard() {
         const select = document.getElementById('projectSelect');
         select.innerHTML = '<option value="">טוען פרויקטים...</option>';
@@ -286,7 +285,6 @@
         }
     }
 
-    // טעינת משתמשי המערכת
     async function loadUsers() {
         const select = document.getElementById('personSelect');
         const query = `{ users { id name } }`;
@@ -315,7 +313,6 @@
         }
     }
 
-    // שליחת הטופס ליצירת משימה או תת-משימה
     document.getElementById('taskForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -329,7 +326,7 @@
 
         const taskName = document.getElementById('taskName').value;
         const projectId = document.getElementById('projectSelect').value;
-        const personId = document.getElementById('personSelect'].value;
+        const personId = document.getElementById('personSelect').value;
         const dueDate = document.getElementById('dueDate').value;
         const priority = document.getElementById('priority').value;
 

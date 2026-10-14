@@ -124,31 +124,42 @@
 </div>
 
 <script>
-    // זיהוי פרמטר requester מה-URL (למשל ?requester=tal)
+    // פונקציה חכמה שמחפשת את טל ברשימה ובוחרת אותו אוטומטית
     function autoSelectTalIfRequested() {
         const urlParams = new URLSearchParams(window.location.search);
         const requesterParam = urlParams.get('requester');
         
         if (requesterParam && (requesterParam.toLowerCase() === 'tal' || requesterParam.toLowerCase() === 'tal_chami' || requesterParam === 'טל')) {
             const requesterSelect = document.getElementById('requesterSelect');
-            for (let i = 0; i < requesterSelect.options.length; i++) {
-                const optText = requesterSelect.options[i].text;
-                if (optText.includes('טל') || optText.includes('Tal')) {
-                    requesterSelect.selectedIndex = i;
-                    break;
+            if (requesterSelect && requesterSelect.options.length > 1) {
+                for (let i = 0; i < requesterSelect.options.length; i++) {
+                    const optText = requesterSelect.options[i].text;
+                    if (optText.includes('טל') || optText.includes('Tal')) {
+                        requesterSelect.selectedIndex = i;
+                        // מוודא שהדפדפן מעדכן את בחירת ה-Select
+                        requesterSelect.dispatchEvent(new Event('change'));
+                        return true; // הצלחנו לבחור!
+                    }
                 }
             }
         }
+        return false;
     }
 
-    // הפעלת הבדיקה גם בטעינה וגם כשמשתנה הלוח
+    // מנסה לבחור שוב ושוב כל חצי שנייה עד שהרשימה ממאנדיי נטענת לגמרי
     window.addEventListener('DOMContentLoaded', () => {
-        autoSelectTalIfRequested();
+        let attempts = 0;
+        const interval = setInterval(() => {
+            attempts++;
+            const success = autoSelectTalIfRequested();
+            if (success || attempts > 20) { // מפסיק אחרי 10 שניות או ברגע שהצליח
+                clearInterval(interval);
+            }
+        }, 500);
     });
 
     function onBoardChange() {
-        // לאחר טעינת האפשרויות של הלוח:
-        setTimeout(autoSelectTalIfRequested, 300);
+        setTimeout(autoSelectTalIfRequested, 400);
     }
 </script>
 

@@ -156,6 +156,7 @@
         <div class="form-group">
             <label class="required" for="taskName">מה המשימה?</label>
             <input type="text" id="taskName" required placeholder="הקלד תיאור משימה...">
+            <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px;" >🎤</button>
         </div>
 
         <div class="form-group">
@@ -452,6 +453,40 @@
             setTimeout(() => { msg.style.display = 'none'; }, 4000);
         }
     });
+    function toggleSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("הדפדפן שלך לא תומך בהקלטה קולית. נסה להשתמש ב-Chrome או Safari.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'he-IL'; // הגדרה לשפה העברית
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    const micBtn = document.getElementById('micBtn');
+    const taskInput = document.getElementById('taskName');
+
+    micBtn.innerText = "🔴"; // משתנה לאדום בזמן הקלטה
+
+    recognition.onresult = function(event) {
+        const speechText = event.results[0][0].transcript;
+        taskInput.value = speechText; // מכניס את הטקסט לשדה המשימה
+        micBtn.innerText = "🎤";
+    };
+
+    recognition.onerror = function(event) {
+        console.error("שגיאה בזיהוי קולי:", event.error);
+        micBtn.innerText = "🎤";
+    };
+
+    recognition.onend = function() {
+        micBtn.innerText = "🎤";
+    };
+
+    recognition.start();
+}
 </script>
 
 </body>

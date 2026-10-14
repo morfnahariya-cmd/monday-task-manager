@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הוספת משימה - ניהול פרויקטים</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f4f5f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 480px;
+        }
+        h2 {
+            color: #323338;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.4rem;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #323338;
+            font-size: 0.95rem;
+        }
+        .required::after {
+            content: " *";
+            color: #e44332;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #c3c6d4;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: #fff;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus {
+            border-color: #0073ea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
+        }
+        button {
+            width: 100%;
+            background-color: #0073ea;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0060b9;
+        }
+        button:disabled {
+            background-color: #a0c4f1;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+        }
+        .success {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>הוספת משימה חדשה</h2>
+    <form id="taskForm">
+        
+        <div class="form-group">
+            <label class="required" for="taskName">מה המשימה?</label>
+            <input type="text" id="taskName" required placeholder="הקלד תיאור משימה...">
+        </div>
+
+        <div class="form-group">
+            <label class="required" for="projectSelect">שם הפרוייקט</label>
+            <select id="projectSelect" required>
+                <option value="">טוען פרויקטים ממאנדיי...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="personSelect">באחריות</label>
+            <select id="personSelect">
+                <option value="">טוען משתמשים...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="dueDate">מועד לביצוע</label>
+            <input type="date" id="dueDate">
+        </div>
+
+        <div class="form-group">
+            <label for="priority">עדיפות</label>
+            <select id="priority">
+                <option value="">ללא עדיפות</option>
+                <option value="Low">Low</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical ⚠️</option>
+            </select>
+        </div>
+
+        <button type="submit" id="submitBtn">הוסף משימה</button>
+    </form>
+
+    <div id="formMessage" class="message"></div>
+</div>
+
+<script>
+    // הגדרות מזהי הלוחות ומפתח ה-API
+    const TASKS_BOARD_ID = "5105855992";
+    const PROJECTS_BOARD_ID = "5097106853";
+    
+    // מפתח ה-API הראשי של הקהילה/החשבון
+    const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM0OTk3NTEwLCJyZ24iOiJldWMxIn0.7lm65-gCEmkWPtzTxBpsnzZOf5NEbircT8FiLEnMwx0";
+
+    // טעינת נתונים ראשוניים בטעינת העמוד
+    window.addEventListener('DOMContentLoaded', () => {
+        loadProjects();
+        loadUsers();
+    });
+
+    // שליפת פרויקטים מלוח ניהול פרויקטים
+    async function loadProjects() {
+        const select = document.getElementById('projectSelect');
+        const query = `{
+            boards(ids: [${PROJECTS_BOARD_ID}]) {
+                items_page {
+                    items {
+                        id
+                        name
+                    }
+                }
+            }
+        }`;
+
+        try {
+            const res = await fetch("https://api.monday.com/v2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": MONDAY_API_KEY
+                },
+                body: JSON.stringify({ query })
+            });
+            const data = await res.json();
+            const items = data.data.boards[0].items_page.items;
+            
+            select.innerHTML = '<option value="">בחר פרויקט...</option>';
+            items.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.name;
+                select.appendChild(opt);
+            });
+        } catch (err) {
+            select.innerHTML = '<option value="">שגיאה שטעינת פרויקטים</option>';
+        }
+    }
+
+    // שליפת משתתפי החשבון
+    async function loadUsers() {
+        const select = document.getElementById('personSelect');
+        const query = `{ users { id name } }`;
+
+        try {
+            const res = await fetch("https://api.monday.com/v2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": MONDAY_API_KEY
+                },
+                body: JSON.stringify({ query })
+            });
+            const data = await res.json();
+            const users = data.data.users;
+
+            select.innerHTML = '<option value="">בחר אחראי/ת...</option>';
+            users.forEach(u => {
+                let opt = document.createElement('option');
+                opt.value = u.id;
+                opt.textContent = u.name;
+                select.appendChild(opt);
+            });
+        } catch (err) {
+            select.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
+        }
+    }
+
+    // שליחת הטופס ליצירת משימה
+    document.getElementById('taskForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('formMessage');
+        
+        btn.disabled = true;
+        btn.textContent = 'שולח משימה...';
+
+        const taskName = document.getElementById('taskName').value;
+        const projectId = document.getElementById('projectSelect').value;
+        const personId = document.getElementById('personSelect').value;
+        const dueDate = document.getElementById('dueDate').value;
+        const priority = document.getElementById('priority').value;
+
+        // בניית ערכי העמודות
+        const columnValues = {};
+        
+        if (projectId) {
+            // חיבור ללוח הפרויקטים
+            columnValues["board_relation"] = { item_ids: [parseInt(projectId)] };
+        }
+        if (personId) {
+            columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
+        }
+        if (dueDate) {
+            columnValues["date"] = { date: dueDate };
+        }
+        if (priority) {
+            columnValues["label"] = { label: priority };
+        }
+
+        const query = `mutation {
+            create_item (
+                board_id: ${TASKS_BOARD_ID},
+                item_name: "${taskName.replace(/"/g, '\\"')}",
+                column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
+            ) {
+                id
+            }
+        }`;
+
+        try {
+            const res = await fetch("https://api.monday.com/v2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": MONDAY_API_KEY
+                },
+                body: JSON.stringify({ query })
+            });
+
+            const result = await res.json();
+
+            if (result.errors) {
+                throw new Error(result.errors[0].message);
+            }
+
+            msg.textContent = 'הערך נוסף בהצלחה למאנדיי!';
+            msg.className = 'message success';
+            msg.style.display = 'block';
+            
+            document.getElementById('taskForm').reset();
+        } catch (err) {
+            msg.textContent = 'שגיאה בשליחת המשימה. נסי שוב.';
+            msg.className = 'message error';
+            msg.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'הוסף משימה';
+            setTimeout(() => { msg.style.display = 'none'; }, 4000);
+        }
+    });
+</script>
+
+</body>
+</html>

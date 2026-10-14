@@ -18,7 +18,6 @@
             min-height: 100vh;
             box-sizing: border-box;
         }
-        /* כפתורים עליונים מחוץ לכרטיסייה, בשורה אחת ולחיצים לחלוטין */
         .tabs-wrapper {
             display: flex;
             gap: 10px;
@@ -142,7 +141,6 @@
 </head>
 <body>
 
-    <!-- כפתורי הניווט הראשיים בסדר החדש: היתרי בניה, תכניות, ניהול פרויקטים, פיקוח על הבניה -->
     <div class="tabs-wrapper">
         <button type="button" class="tab-btn active" id="btnPermits" onclick="switchBoard('permits')">היתרי בניה</button>
         <button type="button" class="tab-btn" id="btnPlans" onclick="switchBoard('plans')">תכניות</button>
@@ -167,10 +165,18 @@
             </select>
         </div>
 
+        <!-- שדה חובה: יוצר/ת המשימה -->
+        <div class="form-group">
+            <label class="required" for="createdBySelect">נוצר על ידי</label>
+            <select id="createdBySelect" required>
+                <option value="">טוען משתמשים...</option>
+            </select>
+        </div>
+
         <div class="form-group">
             <label for="personSelect">באחריות</label>
             <select id="personSelect">
-                <option value="">טוען משתמשים...</option>
+                <option value="">טוען אחראי/ת...</option>
             </select>
         </div>
 
@@ -200,13 +206,28 @@
     const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM0OTk3NTEwLCJyZ24iOiJldWMxIn0.7lm65-gCEmkWPtzTxBpsnzZOf5NEbircT8FiLEnMwx0";
 
     const BOARDS_CONFIG = {
+        permits: {
+            type: "subitem", 
+            boardId: "5095918038",
+            dateCol: "date0",
+            priorityCol: "color_mm40ejck",
+            createdByCol: "multiple_person_mm84fek5"
+        },
+        plans: {
+            type: "subitem", 
+            boardId: "5097101929",
+            dateCol: "date0",
+            priorityCol: "color_mm40ejck",
+            createdByCol: "multiple_person_mm843t5f"
+        },
         projects: {
             type: "item", 
             boardId: "5105855992",
             projectsBoardId: "5097106853",
             projectColumnId: "board_relation_mm84qg4p",
             dateCol: "date4",
-            priorityCol: "color_mm83ak5q"
+            priorityCol: "color_mm83ak5q",
+            createdByCol: "multiple_person_mm84tjtt"
         },
         inspection: {
             type: "item", 
@@ -214,23 +235,11 @@
             projectsBoardId: "5097106872",
             projectColumnId: "board_relation_mm84ngk1",
             dateCol: "date4",
-            priorityCol: "color_mm83ak5q"
-        },
-        permits: {
-            type: "subitem", 
-            boardId: "5095918038",
-            dateCol: "date0",
-            priorityCol: "color_mm40ejck"
-        },
-        plans: {
-            type: "subitem", 
-            boardId: "5097101929",
-            dateCol: "date0",
-            priorityCol: "color_mm40ejck"
+            priorityCol: "color_mm83ak5q",
+            createdByCol: "multiple_person_mm846v2t"
         }
     };
 
-    // מתחילים בברירת מחדל על "היתרי בניה"
     let currentBoardKey = 'permits';
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -241,11 +250,11 @@
     function switchBoard(boardKey) {
         currentBoardKey = boardKey;
         
-        ['projects', 'inspection', 'permits', 'plans'].forEach(key => {
+        ['permits', 'plans', 'projects', 'inspection'].forEach(key => {
             const btnEl = document.getElementById(
-                key === 'projects' ? 'btnProjects' :
-                key === 'inspection' ? 'btnInspection' :
-                key === 'permits' ? 'btnPermits' : 'btnPlans'
+                key === 'permits' ? 'btnPermits' :
+                key === 'plans' ? 'btnPlans' :
+                key === 'projects' ? 'btnProjects' : 'btnInspection'
             );
             btnEl.classList.toggle('active', key === boardKey);
         });
@@ -293,7 +302,8 @@
     }
 
     async function loadUsers() {
-        const select = document.getElementById('personSelect');
+        const personSelect = document.getElementById('personSelect');
+        const createdBySelect = document.getElementById('createdBySelect');
         const query = `{ users { id name } }`;
 
         try {
@@ -308,15 +318,23 @@
             const data = await res.json();
             const users = data.data.users;
 
-            select.innerHTML = '<option value="">בחר אחראי/ת...</option>';
+            personSelect.innerHTML = '<option value="">בחר אחראי/ת...</option>';
+            createdBySelect.innerHTML = '<option value="">בחר יוצר/ת משימה...</option>';
+
             users.forEach(u => {
-                let opt = document.createElement('option');
-                opt.value = u.id;
-                opt.textContent = u.name;
-                select.appendChild(opt);
+                let opt1 = document.createElement('option');
+                opt1.value = u.id;
+                opt1.textContent = u.name;
+                personSelect.appendChild(opt1);
+
+                let opt2 = document.createElement('option');
+                opt2.value = u.id;
+                opt2.textContent = u.name;
+                createdBySelect.appendChild(opt2);
             });
         } catch (err) {
-            select.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
+            personSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
+            createdBySelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
         }
     }
 
@@ -333,6 +351,7 @@
 
         const taskName = document.getElementById('taskName').value;
         const projectId = document.getElementById('projectSelect').value;
+        const createdById = document.getElementById('createdBySelect').value;
         const personId = document.getElementById('personSelect').value;
         const dueDate = document.getElementById('dueDate').value;
         const priority = document.getElementById('priority').value;
@@ -343,6 +362,11 @@
             if (projectId) {
                 columnValues[config.projectColumnId] = { item_ids: [parseInt(projectId)] };
             }
+        }
+
+        // שליחת יוצר המשימה לעמודה הייעודית בלוח
+        if (createdById && config.createdByCol) {
+            columnValues[config.createdByCol] = { personsAndTeams: [{ id: parseInt(createdById), kind: "person" }] };
         }
 
         if (personId) {

@@ -31,6 +31,32 @@
             text-align: center;
             font-size: 1.4rem;
         }
+        /* עיצוב כפתורי הבחירה הראשיים (Tabs) */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            background: #ebecf0;
+            padding: 4px;
+            border-radius: 10px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #676879;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            background: #ffffff;
+            color: #0073ea;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
         .form-group {
             margin-bottom: 18px;
         }
@@ -60,7 +86,7 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
         }
-        button {
+        button[type="submit"] {
             width: 100%;
             background-color: #0073ea;
             color: white;
@@ -73,10 +99,10 @@
             transition: background-color 0.2s;
             margin-top: 10px;
         }
-        button:hover {
+        button[type="submit"]:hover {
             background-color: #0060b9;
         }
-        button:disabled {
+        button[type="submit"]:disabled {
             background-color: #a0c4f1;
             cursor: not-allowed;
         }
@@ -102,16 +128,15 @@
 
 <div class="form-container">
     <h2>הוספת משימה חדשה</h2>
+    
+    <!-- כפתורי מעבר בין הלוחות -->
+    <div class="tabs-container">
+        <button type="button" class="tab-btn active" id="btnProjects" onclick="switchBoard('projects')">ניהול פרוייקטים</button>
+        <button type="button" class="tab-btn" id="btnInspection" onclick="switchBoard('inspection')">פיקוח על הבניה</button>
+    </div>
+
     <form id="taskForm">
         
-        <div class="form-group">
-            <label class="required" for="boardSelect">לאיזה לוח לשלוח?</label>
-            <select id="boardSelect" required>
-                <option value="projects">ניהול פרוייקטים</option>
-                <option value="inspection">פיקוח על הבניה</option>
-            </select>
-        </div>
-
         <div class="form-group">
             <label class="required" for="taskName">מה המשימה?</label>
             <input type="text" id="taskName" required placeholder="הקלד תיאור משימה...">
@@ -120,7 +145,7 @@
         <div class="form-group">
             <label class="required" for="projectSelect">שם הפרוייקט</label>
             <select id="projectSelect" required>
-                <option value="">טוען פרויקטים ממאנדיי...</option>
+                <option value="">טוען פרויקטים...</option>
             </select>
         </div>
 
@@ -156,26 +181,47 @@
 <script>
     const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM0OTk3NTEwLCJyZ24iOiJldWMxIn0.7lm65-gCEmkWPtzTxBpsnzZOf5NEbircT8FiLEnMwx0";
 
+    // הגדרות מלאות לכל לוח
     const BOARDS_CONFIG = {
         projects: {
             boardId: "5105855992",
+            projectsBoardId: "5097106853",
             projectColumnId: "board_relation_mm84qg4p"
         },
         inspection: {
             boardId: "5105969083",
+            projectsBoardId: "5097106872",
             projectColumnId: "board_relation_mm84ngk1"
         }
     };
 
+    let currentBoardKey = 'projects';
+
     window.addEventListener('DOMContentLoaded', () => {
-        loadProjects();
+        loadProjectsForCurrentBoard();
         loadUsers();
     });
 
-    async function loadProjects() {
+    // מעבר בין הלוחות בלחיצה על הכפתורים
+    function switchBoard(boardKey) {
+        currentBoardKey = boardKey;
+        
+        // עדכון עיצוב הכפתורים
+        document.getElementById('btnProjects').classList.toggle('active', boardKey === 'projects');
+        document.getElementById('btnInspection').classList.toggle('active', boardKey === 'inspection');
+
+        // טעינת הפרויקטים המתאימים ללוח הנבחר
+        loadProjectsForCurrentBoard();
+    }
+
+    // טעינת רשימת הפרויקטים בהתאם ללוח המקור הפעיל
+    async function loadProjectsForCurrentBoard() {
         const select = document.getElementById('projectSelect');
+        select.innerHTML = '<option value="">טוען פרויקטים...</option>';
+        
+        const targetProjectsBoardId = BOARDS_CONFIG[currentBoardKey].projectsBoardId;
         const query = `{
-            boards(ids: [5097106853]) {
+            boards(ids: [${targetProjectsBoardId}]) {
                 items_page {
                     items { id name }
                 }
@@ -206,6 +252,7 @@
         }
     }
 
+    // טעינת משתמשי המערכת
     async function loadUsers() {
         const select = document.getElementById('personSelect');
         const query = `{ users { id name } }`;
@@ -234,6 +281,7 @@
         }
     }
 
+    // שליחת הטופס ללוח הנבחר
     document.getElementById('taskForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -243,8 +291,7 @@
         btn.disabled = true;
         btn.textContent = 'שולח משימה...';
 
-        const boardChoice = document.getElementById('boardSelect').value;
-        const currentConfig = BOARDS_CONFIG[boardChoice];
+        const config = BOARDS_CONFIG[currentBoardKey];
 
         const taskName = document.getElementById('taskName').value;
         const projectId = document.getElementById('projectSelect').value;
@@ -255,7 +302,7 @@
         const columnValues = {};
         
         if (projectId) {
-            columnValues[currentConfig.projectColumnId] = { item_ids: [parseInt(projectId)] };
+            columnValues[config.projectColumnId] = { item_ids: [parseInt(projectId)] };
         }
         if (personId) {
             columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
@@ -269,7 +316,7 @@
 
         const query = `mutation {
             create_item (
-                board_id: ${currentConfig.boardId},
+                board_id: ${config.boardId},
                 item_name: "${taskName.replace(/"/g, '\\"')}",
                 column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
             ) {
@@ -300,6 +347,7 @@
             msg.style.display = 'block';
             
             document.getElementById('taskForm').reset();
+            switchBoard(currentBoardKey); // רענון רשימת הפרויקטים לאחר שליחה
         } catch (err) {
             msg.textContent = 'שגיאה בשליחת המשימה. נסי שוב.';
             msg.className = 'message error';

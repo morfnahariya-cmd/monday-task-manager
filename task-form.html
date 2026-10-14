@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>הגשת משימה</title>
+    <title>פורטל משימות - אגף הנדסה</title>
     <style>
         :root {
             --primary: #0073ea;
@@ -31,10 +31,10 @@
 
         .form-card {
             background-color: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             width: 100%;
-            max-width: 550px;
+            max-width: 600px;
             padding: 32px;
             box-sizing: border-box;
         }
@@ -44,6 +44,38 @@
             margin-bottom: 24px;
             text-align: center;
             color: var(--text);
+            font-size: 24px;
+        }
+
+        .board-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .board-btn {
+            background-color: #fff;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .board-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .board-btn.active {
+            background-color: #e5f0ff;
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .form-group {
@@ -59,10 +91,10 @@
 
         select, input[type="text"] {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px;
             border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 15px;
             box-sizing: border-box;
             background-color: #fff;
             transition: border-color 0.2s;
@@ -73,24 +105,25 @@
             border-color: var(--primary);
         }
 
-        button {
+        button.submit-btn {
             width: 100%;
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 14px;
             font-size: 16px;
             font-weight: 600;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.2s;
+            margin-top: 10px;
         }
 
-        button:hover {
+        button.submit-btn:hover {
             background-color: var(--primary-hover);
         }
 
-        button:disabled {
+        button.submit-btn:disabled {
             background-color: #c3c6d4;
             cursor: not-allowed;
         }
@@ -98,10 +131,11 @@
         .status-msg {
             margin-top: 16px;
             padding: 12px;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 14px;
             display: none;
             text-align: center;
+            font-weight: 600;
         }
 
         .status-msg.success {
@@ -127,17 +161,17 @@
 
 <div class="form-card">
     <h2>הגשת משימה חדשה</h2>
+
+    <label>בחר לוח/תחום: *</label>
+    <div class="board-buttons">
+        <button type="button" class="board-btn" data-value="permits">היתרי בניה</button>
+        <button type="button" class="board-btn" data-value="plans">תכניות</button>
+        <button type="button" class="board-btn" data-value="projects">ניהול פרוייקטים</button>
+        <button type="button" class="board-btn" data-value="inspection">פיקוח על הבניה</button>
+    </div>
+
     <form id="taskForm">
-        <div class="form-group">
-            <label for="boardSelect">בחר לוח/תחום *</label>
-            <select id="boardSelect" required>
-                <option value="">-- בחר לוח --</option>
-                <option value="permits">היתרי בניה</option>
-                <option value="plans">תכניות</option>
-                <option value="projects">משימות - ניהול פרוייקטים</option>
-                <option value="inspection">משימות - פיקוח על הבניה</option>
-            </select>
-        </div>
+        <input type="hidden" id="selectedBoard" required>
 
         <div class="form-group" id="parentGroup" style="display:none;">
             <label for="parentSelect">פרויקט/תכנית מקושרת *</label>
@@ -166,7 +200,16 @@
             </select>
         </div>
 
-        <button type="submit" id="submitBtn">שלח משימה</button>
+        <div class="form-group">
+            <label for="prioritySelect">עדיפות</label>
+            <select id="prioritySelect">
+                <option value="Low">נמוכה</option>
+                <option value="Medium" selected>בינונית</option>
+                <option value="High">גבוהה</option>
+            </select>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">שלח משימה</button>
         <div id="statusMsg" class="status-msg"></div>
     </form>
 </div>
@@ -207,3 +250,136 @@
             }
         } catch (e) {
             console.error("Error loading users:", e);
+        }
+    }
+
+    function populateUserDropdowns() {
+        const reqSelect = document.getElementById('requesterSelect');
+        const assSelect = document.getElementById('assigneeSelect');
+
+        reqSelect.innerHTML = '<option value="">-- בחר מבקש --</option>';
+        assSelect.innerHTML = '<option value="">-- ללא משויך --</option>';
+
+        usersList.forEach(u => {
+            reqSelect.innerHTML += `<option value="${u.id}">${u.name}</option>`;
+            assSelect.innerHTML += `<option value="${u.id}">${u.name}</option>`;
+        });
+
+        checkAutoSelectRequester();
+    }
+
+    function checkAutoSelectRequester() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const requesterParam = urlParams.get('requester');
+        if (requesterParam && (requesterParam.toLowerCase() === 'tal' || requesterParam.toLowerCase() === 'tal_chami' || requesterParam === 'טל')) {
+            const reqSelect = document.getElementById('requesterSelect');
+            for (let i = 0; i < reqSelect.options.length; i++) {
+                if (reqSelect.options[i].text.includes('טל') || reqSelect.options[i].text.includes('Tal')) {
+                    reqSelect.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    // ניהול 4 הכפתורים למעלה
+    document.querySelectorAll('.board-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            document.querySelectorAll('.board-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            const boardKey = this.getAttribute('data-value');
+            document.getElementById('selectedBoard').value = boardKey;
+
+            const parentGroup = document.getElementById('parentGroup');
+            const parentSelect = document.getElementById('parentSelect');
+
+            const config = BOARDS_CONFIG[boardKey];
+            if (config.isSubitem) {
+                parentGroup.style.display = 'block';
+                parentSelect.required = true;
+                parentSelect.innerHTML = '<option value="">טוען פרויקטים...</option>';
+
+                const query = `{ boards (ids: [${config.id}]) { items_page (limit: 100) { items { id name } } } }`;
+                try {
+                    const res = await mondayApi(query);
+                    const items = res.data.boards[0].items_page.items;
+                    parentSelect.innerHTML = '<option value="">-- בחר פרויקט --</option>';
+                    items.forEach(item => {
+                        parentSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                } catch (e) {
+                    parentSelect.innerHTML = '<option value="">שגיאה בטעינת פרויקטים</option>';
+                }
+            } else {
+                parentGroup.style.display = 'none';
+                parentSelect.required = false;
+            }
+        });
+    });
+
+    document.getElementById('taskForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        const boardKey = document.getElementById('selectedBoard').value;
+
+        if (!boardKey) {
+            alert('אנא בחר אחד מארבעת התחומים/הלוחות למעלה');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        statusMsg.style.display = 'none';
+
+        const config = BOARDS_CONFIG[boardKey];
+        const taskName = document.getElementById('taskName').value;
+        const requesterId = document.getElementById('requesterSelect').value;
+        const assigneeId = document.getElementById('assigneeSelect').value;
+
+        const columnValues = {};
+        if (requesterId) {
+            columnValues[config.requesterCol] = { personsAndTeams: [{ id: parseInt(requesterId), kind: "person" }] };
+        }
+        if (assigneeId) {
+            columnValues[config.assigneeCol] = { personsAndTeams: [{ id: parseInt(assigneeId), kind: "person" }] };
+        }
+
+        const jsonValues = JSON.stringify(JSON.stringify(columnValues));
+
+        let query = "";
+        if (config.isSubitem) {
+            const parentId = document.getElementById('parentSelect').value;
+            query = `mutation { create_subitem (parent_item_id: ${parentId}, item_name: "${taskName}", column_values: ${jsonValues}) { id } }`;
+        } else {
+            query = `mutation { create_item (board_id: ${config.id}, item_name: "${taskName}", column_values: ${jsonValues}) { id } }`;
+        }
+
+        try {
+            const res = await mondayApi(query);
+            if (res.data) {
+                statusMsg.className = "status-msg success";
+                statusMsg.innerText = "ההמשימה נשלחה בהצלחה!";
+                statusMsg.style.display = 'block';
+                document.getElementById('taskForm').reset();
+                document.querySelectorAll('.board-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('selectedBoard').value = '';
+                document.getElementById('parentGroup').style.display = 'none';
+                checkAutoSelectRequester();
+            } else {
+                throw new Error("API Error");
+            }
+        } catch (e) {
+            statusMsg.className = "status-msg error";
+            statusMsg.innerText = "אירעה שגיאה בשליחת המשימה. אנא נסה שנית.";
+            statusMsg.style.display = 'block';
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+
+    loadUsers();
+</script>
+
+</body>
+</html>

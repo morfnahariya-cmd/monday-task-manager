@@ -165,7 +165,7 @@
             </select>
         </div>
 
-        <!-- שדה מבקש המשימה -->
+        <!-- מבקש המשימה -->
         <div class="form-group">
             <label class="required" for="createdBySelect">מבקש המשימה</label>
             <select id="createdBySelect" required>
@@ -440,7 +440,7 @@
             msg.className = 'message success';
             msg.style.display = 'block';
             
-            document.getElementById('taskForm'].reset();
+            document.getElementById('taskForm').reset();
             switchBoard(currentBoardKey);
         } catch (err) {
             msg.textContent = 'שגיאה בשליחת המשימה. נסי שוב.';

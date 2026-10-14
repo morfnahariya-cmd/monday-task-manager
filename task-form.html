@@ -132,10 +132,10 @@
             <label for="priority">עדיפות</label>
             <select id="priority">
                 <option value="">ללא עדיפות</option>
-                <option value="Low">Low</option>
-                <option value="Medium" selected>Medium</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical ⚠️</option>
+                <option value="נמוך">נמוך</option>
+                <option value="בינוני" selected>בינוני</option>
+                <option value="גבוה">גבוה</option>
+                <option value="קריטי">קריטי ⚠️</option>
             </select>
         </div>
 
@@ -242,21 +242,20 @@
         const dueDate = document.getElementById('dueDate').value;
         const priority = document.getElementById('priority').value;
 
-        // בניית ערכי העמודות
+        // בניית ערכי העמודות עם המזהים המדויקים שלך
         const columnValues = {};
         
         if (projectId) {
-            // חיבור מדויק ללוח הפרויקטים עם המזהה שלך
             columnValues["board_relation_mm84qg4p"] = { item_ids: [parseInt(projectId)] };
         }
         if (personId) {
             columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
         }
         if (dueDate) {
-            columnValues["date"] = { date: dueDate };
+            columnValues["date4"] = { date: dueDate };
         }
         if (priority) {
-            columnValues["label"] = { label: priority };
+            columnValues["color_mm83ak5q"] = { label: priority };
         }
 
         const query = `mutation {

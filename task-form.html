@@ -3,84 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>הגשת משימה חדשה</title>
+    <title>הגשת משימה</title>
     <style>
+        :root {
+            --primary: #0073ea;
+            --primary-hover: #0060c4;
+            --bg: #f5f6f8;
+            --card-bg: #ffffff;
+            --text: #323338;
+            --border: #c3c6d4;
+            --error: #d9381e;
+            --success: #00854d;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f6f8;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
             padding: 20px;
-            direction: rtl;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
+
+        .form-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 550px;
+            padding: 32px;
+            box-sizing: border-box;
         }
+
         h2 {
-            color: #333333;
+            margin-top: 0;
+            margin-bottom: 24px;
             text-align: center;
-            margin-bottom: 25px;
+            color: var(--text);
         }
+
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
+
         label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 600;
-            color: #444444;
-        }
-        input[type="text"], select, textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #cccccc;
-            border-radius: 6px;
-            box-sizing: border-box;
             font-size: 14px;
         }
-        input[type="text"]:focus, select:focus, textarea:focus {
-            border-color: #0073ea;
-            outline: none;
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background-color: #fff;
+            transition: border-color 0.2s;
         }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
         button {
             width: 100%;
-            background-color: #0073ea;
+            background-color: var(--primary);
             color: white;
             border: none;
             padding: 12px;
-            border-radius: 6px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 600;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background-color 0.2s;
         }
+
         button:hover {
-            background-color: #0060c4;
+            background-color: var(--primary-hover);
         }
-        #status-message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 6px;
+
+        button:disabled {
+            background-color: #c3c6d4;
+            cursor: not-allowed;
+        }
+
+        .status-msg {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 14px;
             display: none;
             text-align: center;
-            font-weight: bold;
         }
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
+
+        .status-msg.success {
+            background-color: #e6f4ed;
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-msg.error {
+            background-color: #fcebe8;
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .subitem-note {
+            font-size: 12px;
+            color: #676879;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="form-card">
     <h2>הגשת משימה חדשה</h2>
     <form id="taskForm">
         <div class="form-group">
-            <label for="boardSelect">בחר לוח/תחום:</label>
-            <select id="boardSelect" required onchange="onBoardChange()">
+            <label for="boardSelect">בחר לוח/תחום *</label>
+            <select id="boardSelect" required>
                 <option value="">-- בחר לוח --</option>
                 <option value="permits">היתרי בניה</option>
                 <option value="plans">תכניות</option>
@@ -89,79 +139,71 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <label for="taskTitle">שם המשימה / הפרויקט:</label>
-            <input type="text" id="taskTitle" required placeholder="הזן תיאור קצר...">
+        <div class="form-group" id="parentGroup" style="display:none;">
+            <label for="parentSelect">פרויקט/תכנית מקושרת *</label>
+            <select id="parentSelect">
+                <option value="">-- בחר פרויקט --</option>
+            </select>
+            <div class="subitem-note">המשימה תיווצר כתת-משימה (Subitem) תחת הפרויקט הנבחר.</div>
         </div>
 
         <div class="form-group">
-            <label for="requesterSelect">מבקש המשימה:</label>
+            <label for="taskName">תיאור המשימה *</label>
+            <input type="text" id="taskName" required placeholder="הזן תיאור משימה...">
+        </div>
+
+        <div class="form-group">
+            <label for="requesterSelect">מבקש המשימה *</label>
             <select id="requesterSelect" required>
-                <option value="">-- בחר מבקש --</option>
+                <option value="">טוען משתמשים...</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="assigneeSelect">באחריות (אחראי לביצוע):</label>
+            <label for="assigneeSelect">באחריות (אחראי לביצוע)</label>
             <select id="assigneeSelect">
-                <option value="">-- בחר אחראי --</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="prioritySelect">עדיפות:</label>
-            <select id="prioritySelect">
-                <option value="Low">נמוכה</option>
-                <option value="Medium" selected>בינונית</option>
-                <option value="High">גבוהה</option>
+                <option value="">-- ללא משויך --</option>
             </select>
         </div>
 
         <button type="submit" id="submitBtn">שלח משימה</button>
+        <div id="statusMsg" class="status-msg"></div>
     </form>
-
-    <div id="status-message"></div>
 </div>
 
 <script>
-    // פונקציה חכמה שמחפשת את טל ברשימה ובוחרת אותו אוטומטית
-    function autoSelectTalIfRequested() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const requesterParam = urlParams.get('requester');
-        
-        if (requesterParam && (requesterParam.toLowerCase() === 'tal' || requesterParam.toLowerCase() === 'tal_chami' || requesterParam === 'טל')) {
-            const requesterSelect = document.getElementById('requesterSelect');
-            if (requesterSelect && requesterSelect.options.length > 1) {
-                for (let i = 0; i < requesterSelect.options.length; i++) {
-                    const optText = requesterSelect.options[i].text;
-                    if (optText.includes('טל') || optText.includes('Tal')) {
-                        requesterSelect.selectedIndex = i;
-                        // מוודא שהדפדפן מעדכן את בחירת ה-Select
-                        requesterSelect.dispatchEvent(new Event('change'));
-                        return true; // הצלחנו לבחור!
-                    }
-                }
-            }
-        }
-        return false;
+    const API_URL = "https://api.monday.com/v2";
+    const API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE0MTkxNjc0LCJ1aWQiOjUyMzYzODUwLCJpYWQiOiIyMDI0LTEwLTEwVDExOjMyOjA4LjAwMFoiLCJwZXIiOiJmdWxsIiwiYWN0aW9uIjoicmVhZDp3cml0ZSIsImFwcF9pZCI6MCwianRpIjoiZmFmNTZkMDgtYmE2OC00MDc0LTlhNmItNmY0ZDRlODk2MzdiIn0.9qK4mP6j4M0R9qZ5P8N3X6y8z7w6v5u4t3s2r1q0p9o";
+
+    const BOARDS_CONFIG = {
+        permits: { id: "1675713838", isSubitem: true, requesterCol: "multiple_person_mm84fek5", assigneeCol: "person" },
+        plans: { id: "1675714041", isSubitem: true, requesterCol: "multiple_person_mm84fek5", assigneeCol: "person" },
+        projects: { id: "1675714243", isSubitem: false, requesterCol: "multiple_person_mm84fek5", assigneeCol: "person" },
+        inspection: { id: "1675714402", isSubitem: false, requesterCol: "multiple_person_mm84fek5", assigneeCol: "person" }
+    };
+
+    let usersList = [];
+
+    async function mondayApi(query) {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': API_KEY,
+                'API-Version': '2023-10'
+            },
+            body: JSON.stringify({ query })
+        });
+        return await res.json();
     }
 
-    // מנסה לבחור שוב ושוב כל חצי שנייה עד שהרשימה ממאנדיי נטענת לגמרי
-    window.addEventListener('DOMContentLoaded', () => {
-        let attempts = 0;
-        const interval = setInterval(() => {
-            attempts++;
-            const success = autoSelectTalIfRequested();
-            if (success || attempts > 20) { // מפסיק אחרי 10 שניות או ברגע שהצליח
-                clearInterval(interval);
+    async function loadUsers() {
+        const query = `{ users (limit: 200) { id name } }`;
+        try {
+            const res = await mondayApi(query);
+            if (res.data && res.data.users) {
+                usersList = res.data.users;
+                populateUserDropdowns();
             }
-        }, 500);
-    });
-
-    function onBoardChange() {
-        setTimeout(autoSelectTalIfRequested, 400);
-    }
-</script>
-
-</body>
-</html>
+        } catch (e) {
+            console.error("Error loading users:", e);

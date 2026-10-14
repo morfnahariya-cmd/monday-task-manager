@@ -135,7 +135,7 @@
                 <option value="נמוך">נמוך</option>
                 <option value="בינוני" selected>בינוני</option>
                 <option value="גבוה">גבוה</option>
-                <option value="קריטי">קריטי ⚠️</option>
+                <option value="קריטי">קריטי</option>
             </select>
         </div>
 
@@ -146,29 +146,21 @@
 </div>
 
 <script>
-    // הגדרות מזהי הלוחות ומפתח ה-API
     const TASKS_BOARD_ID = "5105855992";
     const PROJECTS_BOARD_ID = "5097106853";
-    
-    // מפתח ה-API הראשי
     const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM0OTk3NTEwLCJyZ24iOiJldWMxIn0.7lm65-gCEmkWPtzTxBpsnzZOf5NEbircT8FiLEnMwx0";
 
-    // טעינת נתונים ראשוניים בטעינת העמוד
     window.addEventListener('DOMContentLoaded', () => {
         loadProjects();
         loadUsers();
     });
 
-    // שליפת פרויקטים מלוח ניהול פרויקטים
     async function loadProjects() {
         const select = document.getElementById('projectSelect');
         const query = `{
             boards(ids: [${PROJECTS_BOARD_ID}]) {
                 items_page {
-                    items {
-                        id
-                        name
-                    }
+                    items { id name }
                 }
             }
         }`;
@@ -197,7 +189,6 @@
         }
     }
 
-    // שליפת משתתפי החשבון
     async function loadUsers() {
         const select = document.getElementById('personSelect');
         const query = `{ users { id name } }`;
@@ -226,7 +217,6 @@
         }
     }
 
-    // שליחת הטופס ליצירת משימה
     document.getElementById('taskForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -242,7 +232,6 @@
         const dueDate = document.getElementById('dueDate').value;
         const priority = document.getElementById('priority').value;
 
-        // בניית ערכי העמודות עם המזהים המדויקים שלך
         const columnValues = {};
         
         if (projectId) {
@@ -252,9 +241,11 @@
             columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
         }
         if (dueDate) {
+            // פורמט תאריך תקני
             columnValues["date4"] = { date: dueDate };
         }
         if (priority) {
+            // שליחה מדויקת לפי התווית בלוח
             columnValues["color_mm83ak5q"] = { label: priority };
         }
 
@@ -281,6 +272,8 @@
             const result = await res.json();
 
             if (result.errors) {
+                console.error("Monday API Error:", result.errors);
+                alert("שגיאה ממאנדיי: " + result.errors[0].message);
                 throw new Error(result.errors[0].message);
             }
 

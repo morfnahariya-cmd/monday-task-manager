@@ -11,10 +11,42 @@
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
+        }
+        /* כפתורים עליונים מחוץ לכרטיסייה, בשורה אחת */
+        .tabs-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 650px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background-color: #ffffff;
+            color: #323338;
+            border: 2px solid #e1e1e6;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+        }
+        .tab-btn:hover {
+            border-color: #0073ea;
+            color: #0073ea;
+        }
+        .tab-btn.active {
+            background-color: #0073ea;
+            color: white;
+            border-color: #0073ea;
+            box-shadow: 0 4px 10px rgba(0, 115, 234, 0.25);
         }
         .form-container {
             background: #ffffff;
@@ -30,33 +62,6 @@
             margin-bottom: 20px;
             text-align: center;
             font-size: 1.4rem;
-        }
-        /* עיצוב כפתורי הבחירה (Tabs) - מחולקים לשתי שורות לנוחות */
-        .tabs-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 22px;
-            background: #ebecf0;
-            padding: 5px;
-            border-radius: 10px;
-        }
-        .tab-btn {
-            padding: 10px 6px;
-            border: none;
-            background: transparent;
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: #676879;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-        .tab-btn.active {
-            background: #ffffff;
-            color: #0073ea;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
         .form-group {
             margin-bottom: 18px;
@@ -127,16 +132,16 @@
 </head>
 <body>
 
-<div class="form-container">
-    <h2>הוספת משימה חדשה</h2>
-    
-    <!-- כפתורי מעבר בין ארבעת הלוחות -->
-    <div class="tabs-container">
+    <!-- כפתורי הניווט הראשיים מחוץ לכרטיסייה ובשורה אחת -->
+    <div class="tabs-wrapper">
         <button type="button" class="tab-btn active" id="btnProjects" onclick="switchBoard('projects')">ניהול פרוייקטים</button>
         <button type="button" class="tab-btn" id="btnInspection" onclick="switchBoard('inspection')">פיקוח על הבניה</button>
         <button type="button" class="tab-btn" id="btnPermits" onclick="switchBoard('permits')">היתרי בניה</button>
         <button type="button" class="tab-btn" id="btnPlans" onclick="switchBoard('plans')">תכניות</button>
     </div>
+
+<div class="form-container">
+    <h2>הוספת משימה חדשה</h2>
 
     <form id="taskForm">
         
@@ -182,12 +187,12 @@
 </div>
 
 <script>
-    const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiJsonKeyIjoi...wx0";
+    const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM0OTk3NTEwLCJyZ24iOiJldWMxIn0.7lm65-gCEmkWPtzTxBpsnzZOf5NEbircT8FiLEnMwx0";
 
     // הגדרות מלאות לכל 4 הלוחות
     const BOARDS_CONFIG = {
         projects: {
-            type: "item", // משימה ראשית עם חיבור לפרויקט
+            type: "item", 
             boardId: "5105855992",
             projectsBoardId: "5097106853",
             projectColumnId: "board_relation_mm84qg4p",
@@ -195,7 +200,7 @@
             priorityCol: "color_mm83ak5q"
         },
         inspection: {
-            type: "item", // משימה ראשית עם חיבור לפרויקט
+            type: "item", 
             boardId: "5105969083",
             projectsBoardId: "5097106872",
             projectColumnId: "board_relation_mm84ngk1",
@@ -203,14 +208,14 @@
             priorityCol: "color_mm83ak5q"
         },
         permits: {
-            type: "subitem", // תת-משימה ישירות תחת פרויקט בלוח היתרי בניה
-            boardId: "5095918038", // הלוח עצמו מכיל את הפרויקטים
+            type: "subitem", 
+            boardId: "5095918038",
             dateCol: "date0",
             priorityCol: "color_mm40ejck"
         },
         plans: {
-            type: "subitem", // תת-משימה ישירות תחת פרויקט בלוח תכניות
-            boardId: "5097101929", // הלוח עצמו מכיל את הפרויקטים
+            type: "subitem", 
+            boardId: "5097101929",
             dateCol: "date0",
             priorityCol: "color_mm40ejck"
         }
@@ -247,7 +252,6 @@
         select.innerHTML = '<option value="">טוען פרויקטים...</option>';
         
         const config = BOARDS_CONFIG[currentBoardKey];
-        // עבור לוחות Subitem הפרויקטים נשלפים ישירות מתוך הלוח עצמו
         const targetBoardId = config.type === 'item' ? config.projectsBoardId : config.boardId;
 
         const query = `{
@@ -325,14 +329,13 @@
 
         const taskName = document.getElementById('taskName').value;
         const projectId = document.getElementById('projectSelect').value;
-        const personId = document.getElementById('personSelect').value;
+        const personId = document.getElementById('personSelect'].value;
         const dueDate = document.getElementById('dueDate').value;
         const priority = document.getElementById('priority').value;
 
         const columnValues = {};
         
         if (config.type === 'item') {
-            // לוח משימות ראשי: חיבור עמודת הפרויקט
             if (projectId) {
                 columnValues[config.projectColumnId] = { item_ids: [parseInt(projectId)] };
             }
@@ -351,7 +354,6 @@
         let query = '';
 
         if (config.type === 'item') {
-            // יצירת משימה ראשית רגילה
             query = `mutation {
                 create_item (
                     board_id: ${config.boardId},
@@ -362,7 +364,6 @@
                 }
             }`;
         } else {
-            // יצירת תת-משימה (Subitem) מתחת לפרויקט שנבחר
             query = `mutation {
                 create_subitem (
                     parent_item_id: ${projectId},
@@ -397,7 +398,7 @@
             msg.style.display = 'block';
             
             document.getElementById('taskForm').reset();
-            switchBoard(currentBoardKey); // רענון רשימת הפרויקטים לאחר שליחה
+            switchBoard(currentBoardKey);
         } catch (err) {
             msg.textContent = 'שגיאה בשליחת המשימה. נסי שוב.';
             msg.className = 'message error';

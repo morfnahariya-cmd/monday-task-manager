@@ -4,249 +4,492 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>פורטל משימות - מנהל הנדסה</title>
+    <!-- ייבוא פונט Rubik הרשמי של מאנדיי בעברית -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; max-width: 500px; }
-        h2 { text-align: center; color: #1f2937; margin-bottom: 25px; }
-        .tabs { display: flex; gap: 8px; margin-bottom: 20px; width: 100%; max-width: 500px; overflow-x: auto; padding-bottom: 5px; }
-        .tab { flex: 1; min-width: 90px; text-align: center; padding: 10px 5px; background: #e5e7eb; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; color: #4b5563; font-size: 13px; white-space: nowrap; }
-        .tab.active { background: #0073ea; color: white; }
-        .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; color: #374151; font-size: 14px; }
-        label.required::after { content: " *"; color: #e11d48; }
-        input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s; }
-        input:focus, select:focus, textarea:focus { border-color: #0073ea; }
-        button.submit-btn { width: 100%; padding: 12px; background: #0073ea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button.submit-btn:hover { background: #005bb5; }
+        body {
+            font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f4f5f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .tabs-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 650px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+        }
+        .tab-btn {
+            font-family: 'Rubik', sans-serif;
+            background-color: #ffffff;
+            color: #323338;
+            border: 2px solid #e1e1e6;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+        }
+        .tab-btn:hover {
+            border-color: #0073ea;
+            color: #0073ea;
+        }
+        .tab-btn.active {
+            background-color: #0073ea;
+            color: white;
+            border-color: #0073ea;
+            box-shadow: 0 4px 10px rgba(0, 115, 234, 0.25);
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            z-index: 1;
+        }
+        h2 {
+            color: #323338;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #323338;
+            font-size: 0.95rem;
+        }
+        .required::after {
+            content: " *";
+            color: #e44332;
+        }
+        input, select {
+            font-family: 'Rubik', sans-serif;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #c3c6d4;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: #fff;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus {
+            border-color: #0073ea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
+        }
+        button[type="submit"] {
+            font-family: 'Rubik', sans-serif;
+            width: 100%;
+            background-color: #0073ea;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        button[type="submit"]:hover {
+            background-color: #0060b9;
+        }
+        button[type="submit"]:disabled {
+            background-color: #a0c4f1;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+        }
+        .success {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #842029;
+        }
     </style>
 </head>
 <body>
 
-    <div class="tabs">
-        <button class="tab active" onclick="switchBoard('permits')">היתרי בניה</button>
-        <button class="tab" onclick="switchBoard('plans')">תוכניות</button>
-        <button class="tab" onclick="switchBoard('projects')">ניהול פרויקטים</button>
-        <button class="tab" onclick="switchBoard('supervision')">פיקוח על הבניה</button>
+    <div class="tabs-wrapper">
+        <button type="button" class="tab-btn active" id="btnPermits" onclick="switchBoard('permits')">היתרי בניה</button>
+        <button type="button" class="tab-btn" id="btnPlans" onclick="switchBoard('plans')">תכניות</button>
+        <button type="button" class="tab-btn" id="btnProjects" onclick="switchBoard('projects')">ניהול פרוייקטים</button>
+        <button type="button" class="tab-btn" id="btnInspection" onclick="switchBoard('inspection')">פיקוח על הבניה</button>
     </div>
 
-    <div class="container">
-        <h2>הוספת משימה חדשה</h2>
-        <form id="taskForm">
-            <div class="form-group">
-                <label class="required" for="taskName">מה המשימה?</label>
-                <div style="position: relative;">
-                    <input type="text" id="taskName" required placeholder="הקלד/הקלט תיאור משימה..." style="padding-left: 40px;">
-                    <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px;">🔊</button>
-                </div>
-            </div>
+<div class="form-container">
+    <h2>הוספת משימה חדשה</h2>
 
-            <div class="form-group">
-                <label class="required" for="projectSelect">שם הפרויקט</label>
-                <select id="projectSelect" required>
-                    <option value="">טוען פרויקטים...</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="required" for="requesterSelect">מבקש המשימה</label>
-                <select id="requesterSelect" required>
-                    <option value="">טוען משתמשים...</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="assigneeSelect">באחריות</label>
-                <select id="assigneeSelect">
-                    <option value="">טוען אחראי/ת...</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="dueDate">מועד לביצוע</label>
-                <input type="date" id="dueDate">
-            </div>
-
-            <div class="form-group">
-                <label for="prioritySelect">עדיפות</label>
-                <select id="prioritySelect">
-                    <option value="בינוני">בינוני</option>
-                    <option value="גבוה">גבוה</option>
-                    <option value="דחוף">דחוף</option>
-                    <option value="נמוך">נמוך</option>
-                </select>
-            </div>
-
-            <button type="submit" class="submit-btn">הוסף משימה</button>
-        </form>
-    </div>
-
-    <script>
-        const MONDAY_API_KEY = "YOUR_MONDAY_API_KEY_HERE"; // ודאי שמפתח ה-API שלך מוגדר כאן
+    <form id="taskForm">
         
-        const BOARDS_CONFIG = {
-            permits: { type: 'item', boardId: '1835759755', projectsBoardId: '1835759755' },
-            plans: { type: 'item', boardId: '1835759756', projectsBoardId: '1835759756' },
-            projects: { type: 'item', boardId: '1835759757', projectsBoardId: '1835759757' },
-            supervision: { type: 'item', boardId: '1835759758', projectsBoardId: '1835759758' }
-        };
+    <div class="form-group">
+    <label class="required" for="taskName">מה המשימה?</label>
+    <div style="position: relative;">
+        <input type="text" id="taskName" required placeholder="הקלד/הקלט תיאור משימה..." style="padding-left: 40px;">
+        <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0;">🎤</button>
+    </div>
+</div>
 
-        let currentBoardKey = 'permits';
+        <div class="form-group">
+            <label class="required" for="projectSelect">שם הפרוייקט</label>
+            <select id="projectSelect" required>
+                <option value="">טוען פרויקטים...</option>
+            </select>
+        </div>
 
-        async function initForm() {
-            await Promise.all([
-                loadProjects(),
-                loadUsers()
-            ]);
+        <!-- מבקש המשימה -->
+        <div class="form-group">
+            <label class="required" for="createdBySelect">מבקש המשימה</label>
+            <select id="createdBySelect" required>
+                <option value="">טוען משתמשים...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="personSelect">באחריות</label>
+            <select id="personSelect">
+                <option value="">טוען אחראי/ת...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="dueDate">מועד לביצוע</label>
+            <input type="date" id="dueDate">
+        </div>
+
+        <div class="form-group">
+            <label for="priority">עדיפות</label>
+            <select id="priority">
+                <option value="">ללא עדיפות</option>
+                <option value="נמוך">נמוך</option>
+                <option value="בינוני" selected>בינוני</option>
+                <option value="גבוה">גבוה</option>
+                <option value="קריטי">קריטי</option>
+            </select>
+        </div>
+
+        <button type="submit" id="submitBtn">הוסף משימה</button>
+    </form>
+
+    <div id="formMessage" class="message"></div>
+</div>
+
+<script>
+    const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM0OTk3NTEwLCJyZ24iOiJldWMxIn0.7lm65-gCEmkWPtzTxBpsnzZOf5NEbircT8FiLEnMwx0";
+
+    const BOARDS_CONFIG = {
+        permits: {
+            type: "subitem", 
+            boardId: "5095918038",
+            dateCol: "date0",
+            priorityCol: "color_mm40ejck",
+            createdByCol: "multiple_person_mm84fek5"
+        },
+        plans: {
+            type: "subitem", 
+            boardId: "5097101929",
+            dateCol: "date0",
+            priorityCol: "color_mm40ejck",
+            createdByCol: "multiple_person_mm843t5f"
+        },
+        projects: {
+            type: "item", 
+            boardId: "5105855992",
+            projectsBoardId: "5097106853",
+            projectColumnId: "board_relation_mm84qg4p",
+            dateCol: "date4",
+            priorityCol: "color_mm83ak5q",
+            createdByCol: "multiple_person_mm84tjtt"
+        },
+        inspection: {
+            type: "item", 
+            boardId: "5105969083",
+            projectsBoardId: "5097106872",
+            projectColumnId: "board_relation_mm84ngk1",
+            dateCol: "date4",
+            priorityCol: "color_mm83ak5q",
+            createdByCol: "multiple_person_mm846v2t"
         }
+    };
 
-        async function loadProjects() {
-            const select = document.getElementById('projectSelect');
-            select.innerHTML = '<option value="">טוען פרויקטים...</option>';
-            
-            const config = BOARDS_CONFIG[currentBoardKey];
-            const targetBoardId = config.type === 'item' ? config.projectsBoardId : config.boardId;
+    let currentBoardKey = 'permits';
 
-            const query = `{
-                boards(ids: [${targetBoardId}]) {
-                    items_page(limit: 500) {
-                        items {
-                            id
-                            name
-                        }
-                    }
-                }
-            }`;
+    window.addEventListener('DOMContentLoaded', () => {
+        loadProjectsForCurrentBoard();
+        loadUsers();
+    });
 
-            try {
-                const res = await fetch("https://api.monday.com/v2", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": MONDAY_API_KEY
-                    },
-                    body: JSON.stringify({ query })
-                });
-                const data = await res.json();
-
-                if (!data.data || !data.data.boards || data.data.boards.length === 0) {
-                    select.innerHTML = '<option value="">אין פרויקטים זמינים</option>';
-                    return;
-                }
-
-                const boardData = data.data.boards[0];
-                const items = (boardData.items_page && boardData.items_page.items) ? boardData.items_page.items : [];
-
-                if (items.length === 0) {
-                    select.innerHTML = '<option value="">אין פרויקטים זמינים</option>';
-                    return;
-                }
-
-                items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
-
-                select.innerHTML = '<option value="">בחר פרויקט...</option>';
-                items.forEach(item => {
-                    let opt = document.createElement('option');
-                    opt.value = item.id;
-                    opt.textContent = item.name;
-                    select.appendChild(opt);
-                });
-            } catch (err) {
-                console.error("Error loading projects:", err);
-                select.innerHTML = '<option value="">שגיאה בטעינת פרויקטים</option>';
+    function switchBoard(boardKey) {
+        currentBoardKey = boardKey;
+        
+        ['permits', 'plans', 'projects', 'inspection'].forEach(key => {
+            const btnEl = document.getElementById(
+                key === 'permits' ? 'btnPermits' :
+                key === 'plans' ? 'btnPlans' :
+                key === 'projects' ? 'btnProjects' : 'btnInspection'
+            );
+            if (btnEl) {
+                btnEl.classList.toggle('active', key === boardKey);
             }
-        }
+        });
 
-        async function loadUsers() {
-            const reqSelect = document.getElementById('requesterSelect');
-            const assSelect = document.getElementById('assigneeSelect');
-            
-            reqSelect.innerHTML = '<option value="">טוען משתמשים...</option>';
-            assSelect.innerHTML = '<option value="">טוען אחראי/ת...</option>';
+        loadProjectsForCurrentBoard();
+    }
 
-            const query = `{
-                users(limit: 500) {
-                    id
-                    name
+    async function loadProjectsForCurrentBoard() {
+        const select = document.getElementById('projectSelect');
+        if (!select) return;
+        select.innerHTML = '<option value="">טוען פרויקטים...</option>';
+        
+        const config = BOARDS_CONFIG[currentBoardKey];
+        const targetBoardId = config.type === 'item' ? config.projectsBoardId : config.boardId;
+
+        const query = `{
+            boards(ids: [${targetBoardId}]) {
+                items_page {
+                    items { id name }
                 }
-            }`;
-
-            try {
-                const res = await fetch("https://api.monday.com/v2", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": MONDAY_API_KEY
-                    },
-                    body: JSON.stringify({ query })
-                });
-                const data = await res.json();
-
-                if (!data.data || !data.data.users) {
-                    reqSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
-                    assSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
-                    return;
-                }
-
-                const users = data.data.users;
-                users.sort((a, b) => a.name.localeCompare(b.name, 'he'));
-
-                reqSelect.innerHTML = '<option value="">בחר מבקש/ת משימה...</option>';
-                assSelect.innerHTML = '<option value="">בחר אחראי/ת...</option>';
-
-                users.forEach(user => {
-                    let opt1 = document.createElement('option');
-                    opt1.value = user.id;
-                    opt1.textContent = user.name;
-                    reqSelect.appendChild(opt1);
-
-                    let opt2 = document.createElement('option');
-                    opt2.value = user.id;
-                    opt2.textContent = user.name;
-                    assSelect.appendChild(opt2);
-                });
-            } catch (err) {
-                console.error("Error loading users:", err);
-                reqSelect.innerHTML = '<option value="">שגיאה בטעינה</option>';
-                assSelect.innerHTML = '<option value="">שגיאה בטעינה</option>';
             }
-        }
+        }`;
 
-        function switchBoard(key) {
-            currentBoardKey = key;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            loadProjects();
-        }
-
-        function toggleSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("הדפדפן שלך לא תומך בהקלטה קולית.");
+        try {
+            const res = await fetch("https://api.monday.com/v2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": MONDAY_API_KEY
+                },
+                body: JSON.stringify({ query })
+            });
+            const data = await res.json();
+            
+            if (!data.data || !data.data.boards || data.data.boards.length === 0) {
+                select.innerHTML = '<option value="">אין פרויקטים זמינים</option>';
                 return;
             }
 
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'he-IL';
-            recognition.interimResults = false;
+            const items = data.data.boards[0].items_page.items;
+            
+            select.innerHTML = '<option value="">בחר פרויקט...</option>';
+            items.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.name;
+                select.appendChild(opt);
+            });
+        } catch (err) {
+            console.error("Error loading projects:", err);
+            select.innerHTML = '<option value="">שגיאה בטעינת פרויקטים</option>';
+        }
+    }
 
-            const micBtn = document.getElementById('micBtn');
-            const taskInput = document.getElementById('taskName');
+    async function loadUsers() {
+        const personSelect = document.getElementById('personSelect');
+        const createdBySelect = document.getElementById('createdBySelect');
+        if (!personSelect || !createdBySelect) return;
 
-            micBtn.innerText = "🔴";
+        const query = `{ users { id name } }`;
 
-            recognition.onresult = function(event) {
-                taskInput.value = event.results[0][0].transcript;
-                micBtn.innerText = "🔊";
-            };
+        try {
+            const res = await fetch("https://api.monday.com/v2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": MONDAY_API_KEY
+                },
+                body: JSON.stringify({ query })
+            });
+            const data = await res.json();
+            
+            if (!data.data || !data.data.users) return;
+            
+            const users = data.data.users;
 
-            recognition.onerror = function() { micBtn.innerText = "🔊"; };
-            recognition.onend = function() { micBtn.innerText = "🔊"; };
+            personSelect.innerHTML = '<option value="">בחר אחראי/ת...</option>';
+            createdBySelect.innerHTML = '<option value="">בחר מבקש/ת משימה...</option>';
 
-            recognition.start();
+            users.forEach(u => {
+                let opt1 = document.createElement('option');
+                opt1.value = u.id;
+                opt1.textContent = u.name;
+                personSelect.appendChild(opt1);
+
+                let opt2 = document.createElement('option');
+                opt2.value = u.id;
+                opt2.textContent = u.name;
+                createdBySelect.appendChild(opt2);
+            });
+        } catch (err) {
+            console.error("Error loading users:", err);
+            personSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
+            createdBySelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
+        }
+    }
+
+    document.getElementById('taskForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('formMessage');
+        
+        btn.disabled = true;
+        btn.textContent = 'שולח משימה...';
+
+        const config = BOARDS_CONFIG[currentBoardKey];
+
+        const taskName = document.getElementById('taskName').value;
+        const projectId = document.getElementById('projectSelect').value;
+        const createdById = document.getElementById('createdBySelect').value;
+        const personId = document.getElementById('personSelect').value;
+        const dueDate = document.getElementById('dueDate').value;
+        const priority = document.getElementById('priority').value;
+
+        const columnValues = {};
+        
+        if (config.type === 'item') {
+            if (projectId) {
+                columnValues[config.projectColumnId] = { item_ids: [parseInt(projectId)] };
+            }
         }
 
-        window.onload = initForm;
-    </script>
+        if (createdById && config.createdByCol) {
+            columnValues[config.createdByCol] = { personsAndTeams: [{ id: parseInt(createdById), kind: "person" }] };
+        }
+
+        if (personId) {
+            columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
+        }
+        if (dueDate) {
+            columnValues[config.dateCol] = { date: dueDate };
+        }
+        if (priority) {
+            columnValues[config.priorityCol] = { label: priority };
+        }
+
+        let query = '';
+
+        if (config.type === 'item') {
+            query = `mutation {
+                create_item (
+                    board_id: ${config.boardId},
+                    item_name: "${taskName.replace(/"/g, '\\"')}",
+                    column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
+                ) {
+                    id
+                }
+            }`;
+        } else {
+            query = `mutation {
+                create_subitem (
+                    parent_item_id: ${projectId},
+                    item_name: "${taskName.replace(/"/g, '\\"')}",
+                    column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
+                ) {
+                    id
+                }
+            }`;
+        }
+
+        try {
+            const res = await fetch("https://api.monday.com/v2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": MONDAY_API_KEY
+                },
+                body: JSON.stringify({ query })
+            });
+
+            const result = await res.json();
+
+            if (result.errors) {
+                console.error("Monday API Error:", result.errors);
+                alert("שגיאה ממאנדיי: " + result.errors[0].message);
+                throw new Error(result.errors[0].message);
+            }
+
+            msg.textContent = 'המשימה נוספה בהצלחה למאנדיי!';
+            msg.className = 'message success';
+            msg.style.display = 'block';
+            
+            document.getElementById('taskForm').reset();
+            switchBoard(currentBoardKey);
+        } catch (err) {
+            msg.textContent = 'שגיאה בשליחת המשימה. נסי שוב.';
+            msg.className = 'message error';
+            msg.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'הוסף משימה';
+            setTimeout(() => { msg.style.display = 'none'; }, 4000);
+        }
+    });
+    function toggleSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("הדפדפן שלך לא תומך בהקלטה קולית. נסה להשתמש ב-Chrome או Safari.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'he-IL'; // הגדרה לשפה העברית
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    const micBtn = document.getElementById('micBtn');
+    const taskInput = document.getElementById('taskName');
+
+    micBtn.innerText = "🔴"; // משתנה לאדום בזמן הקלטה
+
+    recognition.onresult = function(event) {
+        const speechText = event.results[0][0].transcript;
+        taskInput.value = speechText; // מכניס את הטקסט לשדה המשימה
+        micBtn.innerText = "🎤";
+    };
+
+    recognition.onerror = function(event) {
+        console.error("שגיאה בזיהוי קולי:", event.error);
+        micBtn.innerText = "🎤";
+    };
+
+    recognition.onend = function() {
+        micBtn.innerText = "🎤";
+    };
+
+    recognition.start();
+}
+</script>
+
 </body>
 </html>

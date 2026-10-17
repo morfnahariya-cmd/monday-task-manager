@@ -157,7 +157,7 @@
     <label class="required" for="taskName">מה המשימה?</label>
     <div style="position: relative;">
         <input type="text" id="taskName" required placeholder="הקלד/הקלט תיאור משימה..." style="padding-left: 40px;">
-        <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0;">🎤</button>
+        <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0;">🔊</button>
     </div>
 </div>
 
@@ -277,7 +277,7 @@
 
         const query = `{
             boards(ids: [${targetBoardId}]) {
-                items_page {
+                items_page(limit: 500) {
                     items { id name }
                 }
             }
@@ -301,6 +301,8 @@
 
             const items = data.data.boards[0].items_page.items;
             
+            items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+
             select.innerHTML = '<option value="">בחר פרויקט...</option>';
             items.forEach(item => {
                 let opt = document.createElement('option');
@@ -319,7 +321,7 @@
         const createdBySelect = document.getElementById('createdBySelect');
         if (!personSelect || !createdBySelect) return;
 
-        const query = `{ users { id name } }`;
+        const query = `{ users(limit: 500) { id name } }`;
 
         try {
             const res = await fetch("https://api.monday.com/v2", {
@@ -335,6 +337,7 @@
             if (!data.data || !data.data.users) return;
             
             const users = data.data.users;
+            users.sort((a, b) => a.name.localeCompare(b.name, 'he'));
 
             personSelect.innerHTML = '<option value="">בחר אחראי/ת...</option>';
             createdBySelect.innerHTML = '<option value="">בחר מבקש/ת משימה...</option>';
@@ -424,7 +427,7 @@
         try {
             const res = await fetch("https://api.monday.com/v2", {
                 method: "POST",
-                headers: {
+            headers: {
                     "Content-Type": "application/json",
                     "Authorization": MONDAY_API_KEY
                 },
@@ -455,40 +458,41 @@
             setTimeout(() => { msg.style.display = 'none'; }, 4000);
         }
     });
+
     function toggleSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        alert("הדפדפן שלך לא תומך בהקלטה קולית. נסה להשתמש ב-Chrome או Safari.");
-        return;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("הדפדפן שלך לא תומך בהקלטה קולית. נסה להשתמש ב-Chrome או Safari.");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'he-IL';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        const micBtn = document.getElementById('micBtn');
+        const taskInput = document.getElementById('taskName');
+
+        micBtn.innerText = "🔴";
+
+        recognition.onresult = function(event) {
+            const speechText = event.results[0][0].transcript;
+            taskInput.value = speechText;
+            micBtn.innerText = "🔊";
+        };
+
+        recognition.onerror = function(event) {
+            console.error("שגיאה בזיהוי קולי:", event.error);
+            micBtn.innerText = "🔊";
+        };
+
+        recognition.onend = function() {
+            micBtn.innerText = "🔊";
+        };
+
+        recognition.start();
     }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'he-IL'; // הגדרה לשפה העברית
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    const micBtn = document.getElementById('micBtn');
-    const taskInput = document.getElementById('taskName');
-
-    micBtn.innerText = "🔴"; // משתנה לאדום בזמן הקלטה
-
-    recognition.onresult = function(event) {
-        const speechText = event.results[0][0].transcript;
-        taskInput.value = speechText; // מכניס את הטקסט לשדה המשימה
-        micBtn.innerText = "🎤";
-    };
-
-    recognition.onerror = function(event) {
-        console.error("שגיאה בזיהוי קולי:", event.error);
-        micBtn.innerText = "🎤";
-    };
-
-    recognition.onend = function() {
-        micBtn.innerText = "🎤";
-    };
-
-    recognition.start();
-}
 </script>
 
 </body>

@@ -277,10 +277,13 @@
 
         const query = `{
             boards(ids: [${targetBoardId}]) {
-                items_page {
-                    items { id name }
-                }
-            }
+              // הקוד המעודכן שימשוך עד 500 פרויקטים:
+items_page(limit: 500) {
+    items {
+        id
+        name
+    }
+}
         }`;
 
         try {

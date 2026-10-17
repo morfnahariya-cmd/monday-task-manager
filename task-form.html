@@ -285,7 +285,7 @@ items_page(limit: 500) {
 }
         }`;
 
-        try {
+       try {
             const res = await fetch("https://api.monday.com/v2", {
                 method: "POST",
                 headers: {
@@ -295,14 +295,23 @@ items_page(limit: 500) {
                 body: JSON.stringify({ query })
             });
             const data = await res.json();
-            
+
             if (!data.data || !data.data.boards || data.data.boards.length === 0) {
                 select.innerHTML = '<option value="">אין פרויקטים זמינים</option>';
                 return;
             }
 
-            const items = data.data.boards[0].items_page.items;
-            
+            const boardData = data.data.boards[0];
+            const items = (boardData.items_page && boardData.items_page.items) ? boardData.items_page.items : (boardData.items || []);
+
+            if (items.length === 0) {
+                select.innerHTML = '<option value="">אין פרויקטים זמינים</option>';
+                return;
+            }
+
+            // מיון הפרויקטים לפי א"ב עברי
+            items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+
             select.innerHTML = '<option value="">בחר פרויקט...</option>';
             items.forEach(item => {
                 let opt = document.createElement('option');
@@ -314,7 +323,6 @@ items_page(limit: 500) {
             console.error("Error loading projects:", err);
             select.innerHTML = '<option value="">שגיאה בטעינת פרויקטים</option>';
         }
-    }
 
     async function loadUsers() {
         const personSelect = document.getElementById('personSelect');

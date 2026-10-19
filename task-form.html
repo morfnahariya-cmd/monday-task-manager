@@ -161,26 +161,31 @@
     </div>
 </div>
 
+        <!-- שם הפרויקט עם חיפוש והקלדה -->
         <div class="form-group">
-            <label class="required" for="projectSelect">שם הפרוייקט</label>
-            <select id="projectSelect" required>
-                <option value="">טוען פרויקטים...</option>
-            </select>
+            <label class="required" for="projectInput">שם הפרוייקט</label>
+            <input type="text" id="projectInput" list="projectsList" required placeholder="הקלד או בחר פרויקט...">
+            <datalist id="projectsList">
+                <option value="טוען פרויקטים...">
+            </datalist>
         </div>
 
-        <!-- מבקש המשימה -->
+        <!-- מבקש המשימה עם חיפוש והקלדה -->
         <div class="form-group">
-            <label class="required" for="createdBySelect">מבקש המשימה</label>
-            <select id="createdBySelect" required>
-                <option value="">טוען משתמשים...</option>
-            </select>
+            <label class="required" for="createdByInput">מבקש המשימה</label>
+            <input type="text" id="createdByInput" list="usersList1" required placeholder="הקלד או בחר מבקש...">
+            <datalist id="usersList1">
+                <option value="טוען משתמשים...">
+            </datalist>
         </div>
 
+        <!-- אחראי/ת עם חיפוש והקלדה -->
         <div class="form-group">
-            <label for="personSelect">באחריות</label>
-            <select id="personSelect">
-                <option value="">טוען אחראי/ת...</option>
-            </select>
+            <label for="personInput">באחריות</label>
+            <input type="text" id="personInput" list="usersList2" placeholder="הקלד או בחר אחראי/ת...">
+            <datalist id="usersList2">
+                <option value="טוען משתמשים...">
+            </datalist>
         </div>
 
         <div class="form-group">
@@ -244,6 +249,8 @@
     };
 
     let currentBoardKey = 'permits';
+    let projectsMap = {}; // נשמור מיפוי משם הפרויקט ל-ID שלו
+    let usersMap = {};     // נשמור מיפוי משם המשתמש ל-ID שלו
 
     window.addEventListener('DOMContentLoaded', () => {
         loadProjectsForCurrentBoard();
@@ -268,9 +275,13 @@
     }
 
     async function loadProjectsForCurrentBoard() {
-        const select = document.getElementById('projectSelect');
-        if (!select) return;
-        select.innerHTML = '<option value="">טוען פרויקטים...</option>';
+        const input = document.getElementById('projectInput');
+        const datalist = document.getElementById('projectsList');
+        if (!input || !datalist) return;
+        
+        input.value = '';
+        datalist.innerHTML = '<option value="טוען פרויקטים...">';
+        projectsMap = {};
         
         const config = BOARDS_CONFIG[currentBoardKey];
         const targetBoardId = config.type === 'item' ? config.projectsBoardId : config.boardId;
@@ -295,31 +306,30 @@
             const data = await res.json();
             
             if (!data.data || !data.data.boards || data.data.boards.length === 0) {
-                select.innerHTML = '<option value="">אין פרויקטים זמינים</option>';
+                datalist.innerHTML = '<option value="אין פרויקטים זמינים">';
                 return;
             }
 
             const items = data.data.boards[0].items_page.items;
-            
             items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
 
-            select.innerHTML = '<option value="">בחר פרויקט...</option>';
+            datalist.innerHTML = '';
             items.forEach(item => {
+                projectsMap[item.name] = item.id;
                 let opt = document.createElement('option');
-                opt.value = item.id;
-                opt.textContent = item.name;
-                select.appendChild(opt);
+                opt.value = item.name;
+                datalist.appendChild(opt);
             });
         } catch (err) {
             console.error("Error loading projects:", err);
-            select.innerHTML = '<option value="">שגיאה בטעינת פרויקטים</option>';
+            datalist.innerHTML = '<option value="שגיאה בטעינת פרויקטים">';
         }
     }
 
     async function loadUsers() {
-        const personSelect = document.getElementById('personSelect');
-        const createdBySelect = document.getElementById('createdBySelect');
-        if (!personSelect || !createdBySelect) return;
+        const datalist1 = document.getElementById('usersList1');
+        const datalist2 = document.getElementById('usersList2');
+        if (!datalist1 || !datalist2) return;
 
         const query = `{ users(limit: 500) { id name } }`;
 
@@ -339,24 +349,23 @@
             const users = data.data.users;
             users.sort((a, b) => a.name.localeCompare(b.name, 'he'));
 
-            personSelect.innerHTML = '<option value="">בחר אחראי/ת...</option>';
-            createdBySelect.innerHTML = '<option value="">בחר מבקש/ת משימה...</option>';
+            datalist1.innerHTML = '';
+            datalist2.innerHTML = '';
+            usersMap = {};
 
             users.forEach(u => {
+                usersMap[u.name] = u.id;
+                
                 let opt1 = document.createElement('option');
-                opt1.value = u.id;
-                opt1.textContent = u.name;
-                personSelect.appendChild(opt1);
+                opt1.value = u.name;
+                datalist1.appendChild(opt1);
 
                 let opt2 = document.createElement('option');
-                opt2.value = u.id;
-                opt2.textContent = u.name;
-                createdBySelect.appendChild(opt2);
+                opt2.value = u.name;
+                datalist2.appendChild(opt2);
             });
         } catch (err) {
             console.error("Error loading users:", err);
-            personSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
-            createdBySelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
         }
     }
 
@@ -372,11 +381,23 @@
         const config = BOARDS_CONFIG[currentBoardKey];
 
         const taskName = document.getElementById('taskName').value;
-        const projectId = document.getElementById('projectSelect').value;
-        const createdById = document.getElementById('createdBySelect').value;
-        const personId = document.getElementById('personSelect').value;
+        const projectName = document.getElementById('projectInput').value;
+        const createdByName = document.getElementById('createdByInput').value;
+        const personName = document.getElementById('personInput').value;
         const dueDate = document.getElementById('dueDate').value;
         const priority = document.getElementById('priority').value;
+
+        // המרת שמות בחזרה ל-IDs של Monday באמצעות המיפויים
+        const projectId = projectsMap[projectName];
+        const createdById = usersMap[createdByName];
+        const personId = usersMap[personName];
+
+        if (config.type === 'item' && !projectId) {
+            alert("אנא בחרי פרויקט תקין מהרשימה");
+            btn.disabled = false;
+            btn.textContent = 'הוסף משימה';
+            return;
+        }
 
         const columnValues = {};
         
@@ -427,7 +448,7 @@
         try {
             const res = await fetch("https://api.monday.com/v2", {
                 method: "POST",
-            headers: {
+                headers: {
                     "Content-Type": "application/json",
                     "Authorization": MONDAY_API_KEY
                 },

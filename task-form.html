@@ -277,7 +277,7 @@
 
         const query = `{
             boards(ids: [${targetBoardId}]) {
-                items_page(limit: 500) {
+                items_page(limit: 1000) {
                     items { id name }
                 }
             }

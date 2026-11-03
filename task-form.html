@@ -373,7 +373,7 @@
         projectsMap = {};
         
         const config = BOARDS_CONFIG[currentBoardKey];
-        const targetBoardId = config.type === 'item' ? config.projectsBoardId : config.boardId;
+        const targetBoardId = config.projectsBoardId || config.boardId;
 
         const query = `{
             boards(ids: [${targetBoardId}]) {
@@ -394,12 +394,17 @@
             });
             const data = await res.json();
             
-            if (!data.data || !data.data.boards || data.data.boards.length === 0) {
-                datalist.innerHTML = '<option value="אין פרויקטים זמינים">';
+            if (!data.data || !data.data.boards || data.data.boards.length === 0 || !data.data.boards[0].items_page) {
+                await loadProjectsFallback(config.boardId, datalist);
                 return;
             }
 
             const items = data.data.boards[0].items_page.items;
+            if (!items || items.length === 0) {
+                datalist.innerHTML = '<option value="אין פרויקטים זמינים">';
+                return;
+            }
+
             items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
 
             datalist.innerHTML = '';
@@ -411,6 +416,42 @@
             });
         } catch (err) {
             console.error("Error loading projects:", err);
+            datalist.innerHTML = '<option value="שגיאה בטעינת פרויקטים">';
+        }
+    }
+
+    async function loadProjectsFallback(fallbackBoardId, datalist) {
+        const query = `{
+            boards(ids: [${fallbackBoardId}]) {
+                items_page(limit: 1000) {
+                    items { id name }
+                }
+            }
+        }`;
+        try {
+            const res = await fetch("https://api.monday.com/v2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": MONDAY_API_KEY
+                },
+                body: JSON.stringify({ query })
+            });
+            const data = await res.json();
+            if (data.data && data.data.boards && data.data.boards[0].items_page) {
+                const items = data.data.boards[0].items_page.items;
+                items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+                datalist.innerHTML = '';
+                items.forEach(item => {
+                    projectsMap[item.name] = item.id;
+                    let opt = document.createElement('option');
+                    opt.value = item.name;
+                    datalist.appendChild(opt);
+                });
+            } else {
+                datalist.innerHTML = '<option value="אין פרויקטים זמינים">';
+            }
+        } catch (e) {
             datalist.innerHTML = '<option value="שגיאה בטעינת פרויקטים">';
         }
     }
@@ -445,19 +486,16 @@
             users.forEach(u => {
                 usersMap[u.name] = u.id;
                 
-                // הוספה למסך ההתחברות
                 let optLogin = document.createElement('option');
                 optLogin.value = u.name;
                 optLogin.textContent = u.name;
                 loginSelect.appendChild(optLogin);
 
-                // הוספה לשדה האחריות
                 let opt2 = document.createElement('option');
                 opt2.value = u.name;
                 datalist2.appendChild(opt2);
             });
 
-            // בדיקה אם המשתמש כבר מחובר מקודם בדפדפן
             const savedUser = localStorage.getItem('monday_portal_user');
             if (savedUser && usersMap[savedUser]) {
                 currentUser = { name: savedUser, id: usersMap[savedUser] };
@@ -569,7 +607,7 @@
         const priority = document.getElementById('priority').value;
 
         const projectId = projectsMap[projectName];
-        const createdById = currentUser.id; // המשתמש המחובר נשלח אוטומטית כמבקש המשימה
+        const createdById = currentUser.id; 
         const personId = usersMap[personName];
 
         if (config.type === 'item' && !projectId) {

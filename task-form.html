@@ -339,17 +339,15 @@
     let usersMap = {};     
     let currentUser = null;
 
-    // טעינת הנתונים בעליית הדף בצורה בטוחה וישירה
+    // טעינת הנתונים בעליית הדף בצורה מבוקרת
     window.addEventListener('DOMContentLoaded', () => {
-        loadUsers();
-        loadProjectsForCurrentBoard();
+        loadUsersAndInit();
     });
 
-    async function loadUsers() {
+    async function loadUsersAndInit() {
         const loginSelect = document.getElementById('loginUserSelect');
         const datalist2 = document.getElementById('usersList2');
-        if (!loginSelect || !datalist2) return;
-
+        
         const query = `{ users(limit: 500) { id name } }`;
 
         try {
@@ -367,21 +365,25 @@
                 const users = data.data.users;
                 users.sort((a, b) => a.name.localeCompare(b.name, 'he'));
 
-                loginSelect.innerHTML = '<option value="">בחר את שמך מהרשימה...</option>';
-                datalist2.innerHTML = '';
+                if (loginSelect) loginSelect.innerHTML = '<option value="">בחר את שמך מהרשימה...</option>';
+                if (datalist2) datalist2.innerHTML = '';
                 usersMap = {};
 
                 users.forEach(u => {
                     usersMap[u.name] = u.id;
                     
-                    let optLogin = document.createElement('option');
-                    optLogin.value = u.name;
-                    optLogin.textContent = u.name;
-                    loginSelect.appendChild(optLogin);
+                    if (loginSelect) {
+                        let optLogin = document.createElement('option');
+                        optLogin.value = u.name;
+                        optLogin.textContent = u.name;
+                        loginSelect.appendChild(optLogin);
+                    }
 
-                    let opt2 = document.createElement('option');
-                    opt2.value = u.name;
-                    datalist2.appendChild(opt2);
+                    if (datalist2) {
+                        let opt2 = document.createElement('option');
+                        opt2.value = u.name;
+                        datalist2.appendChild(opt2);
+                    }
                 });
             }
 
@@ -395,8 +397,11 @@
 
         } catch (err) {
             console.error("Error loading users:", err);
-            loginSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
+            if (loginSelect) loginSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
         }
+
+        // טעינת הפרויקטים ללוח הנוכחי מיד לאחר טעינת המשתמשים
+        loadProjectsForCurrentBoard();
     }
 
     async function loadProjectsForCurrentBoard() {

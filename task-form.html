@@ -1,702 +1,989 @@
 <!DOCTYPE html>
+
 <html lang="he" dir="rtl">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>פורטל משימות - מנהל הנדסה</title>
+
     <!-- ייבוא פונט Rubik הרשמי של מאנדיי בעברית -->
+
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+
         body {
+
             font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
             background-color: #f4f5f7;
+
             margin: 0;
+
             padding: 20px;
+
             display: flex;
+
             flex-direction: column;
+
             align-items: center;
+
             min-height: 100vh;
+
             box-sizing: border-box;
+
         }
+
         .tabs-wrapper {
+
             display: flex;
+
             gap: 10px;
+
             margin-bottom: 25px;
+
             width: 100%;
+
             max-width: 650px;
+
             justify-content: center;
+
             flex-wrap: wrap;
+
             position: relative;
+
             z-index: 10;
+
         }
+
         .tab-btn {
+
             font-family: 'Rubik', sans-serif;
+
             background-color: #ffffff;
+
             color: #323338;
+
             border: 2px solid #e1e1e6;
+
             padding: 10px 18px;
+
             border-radius: 25px;
+
             font-size: 0.95rem;
+
             font-weight: 600;
+
             cursor: pointer;
+
             transition: all 0.2s ease;
+
             box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+
         }
+
         .tab-btn:hover {
+
             border-color: #0073ea;
+
             color: #0073ea;
+
         }
+
         .tab-btn.active {
+
             background-color: #0073ea;
+
             color: white;
+
             border-color: #0073ea;
+
             box-shadow: 0 4px 10px rgba(0, 115, 234, 0.25);
+
         }
+
         .form-container {
+
             background: #ffffff;
+
             padding: 25px;
+
             border-radius: 12px;
+
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+
             width: 100%;
+
             max-width: 500px;
+
             position: relative;
+
             z-index: 1;
+
         }
+
         h2 {
+
             color: #323338;
+
             margin-top: 0;
+
             margin-bottom: 20px;
+
             text-align: center;
+
             font-size: 1.4rem;
+
             font-weight: 600;
+
         }
+
         .form-group {
+
             margin-bottom: 18px;
+
         }
+
         label {
+
             display: block;
+
             margin-bottom: 6px;
+
             font-weight: 600;
+
             color: #323338;
+
             font-size: 0.95rem;
+
         }
+
         .required::after {
+
             content: " *";
+
             color: #e44332;
+
         }
+
         input, select {
+
             font-family: 'Rubik', sans-serif;
+
             width: 100%;
+
             padding: 12px;
+
             border: 1px solid #c3c6d4;
+
             border-radius: 8px;
+
             font-size: 1rem;
+
             box-sizing: border-box;
+
             background-color: #fff;
+
             transition: border-color 0.2s;
+
         }
+
         input:focus, select:focus {
+
             border-color: #0073ea;
+
             outline: none;
+
             box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
+
         }
-        button[type="submit"], .action-btn {
+
+        button[type="submit"] {
+
             font-family: 'Rubik', sans-serif;
+
             width: 100%;
+
             background-color: #0073ea;
+
             color: white;
+
             border: none;
+
             padding: 14px;
+
             border-radius: 8px;
+
             font-size: 1.05rem;
+
             font-weight: 600;
+
             cursor: pointer;
+
             transition: background-color 0.2s;
+
             margin-top: 10px;
+
         }
-        button[type="submit"]:hover, .action-btn:hover {
+
+        button[type="submit"]:hover {
+
             background-color: #0060b9;
+
         }
+
         button[type="submit"]:disabled {
+
             background-color: #a0c4f1;
+
             cursor: not-allowed;
+
         }
+
         .message {
+
             margin-top: 15px;
+
             padding: 12px;
+
             border-radius: 8px;
+
             text-align: center;
+
             display: none;
+
             font-weight: 500;
+
         }
+
         .success {
+
             background-color: #d1e7dd;
+
             color: #0f5132;
+
         }
+
         .error {
+
             background-color: #f8d7da;
+
             color: #842029;
+
         }
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-box {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-        .user-greeting {
-            background: #e1f5fe;
-            color: #01579b;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .top-link-btn {
-            background: none;
-            border: none;
-            color: #0277bd;
-            cursor: pointer;
-            text-decoration: underline;
-            font-size: 0.85rem;
-            font-family: 'Rubik', sans-serif;
-            margin-left: 8px;
-        }
+
     </style>
+
 </head>
+
 <body>
 
-    <!-- מסך התחברות בכניסה -->
-    <div id="loginOverlay" class="modal-overlay">
-        <div class="modal-box">
-            <h2>התחברות לפורטל</h2>
-            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">בחר את שמך והזן סיסמה</p>
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group" style="text-align: right;">
-                    <label class="required" for="loginUserSelect">שם משתמש (מהמאנדיי)</label>
-                    <select id="loginUserSelect" required>
-                        <option value="">טוען משתמשים...</option>
-                    </select>
-                </div>
-                <div class="form-group" style="text-align: right;">
-                    <label class="required" for="loginPass">סיסמה</label>
-                    <input type="password" id="loginPass" required placeholder="הזן סיסמה (ברירת מחדל: nahariya123)">
-                </div>
-                <button type="submit" class="action-btn">התחבר</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- חלון החלפת סיסמה -->
-    <div id="changePassModal" class="modal-overlay" style="display: none;">
-        <div class="modal-box">
-            <h2>החלפת סיסמה</h2>
-            <form onsubmit="handlePasswordChange(event)">
-                <div class="form-group" style="text-align: right;">
-                    <label class="required" for="oldPass">סיסמה קודמת</label>
-                    <input type="password" id="oldPass" required placeholder="הקלד סיסמה קודמת...">
-                </div>
-                <div class="form-group" style="text-align: right;">
-                    <label class="required" for="newPass">סיסמה חדשה</label>
-                    <input type="password" id="newPass" required placeholder="הקלד סיסמה חדשה...">
-                </div>
-                <div class="form-group" style="text-align: right;">
-                    <label class="required" for="confirmPass">אימות סיסמה חדשה</label>
-                    <input type="password" id="confirmPass" required placeholder="הקלד שוב סיסמה חדשה...">
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button type="button" class="action-btn" style="background-color: #6c757d;" onclick="closeChangePassModal()">ביטול</button>
-                    <button type="submit" class="action-btn">אישור</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <div class="tabs-wrapper">
+
         <button type="button" class="tab-btn active" id="btnPermits" onclick="switchBoard('permits')">היתרי בניה</button>
+
         <button type="button" class="tab-btn" id="btnPlans" onclick="switchBoard('plans')">תכניות</button>
+
         <button type="button" class="tab-btn" id="btnProjects" onclick="switchBoard('projects')">ניהול פרוייקטים</button>
+
         <button type="button" class="tab-btn" id="btnInspection" onclick="switchBoard('inspection')">פיקוח על הבניה</button>
+
     </div>
+
 
 <div class="form-container">
+
     <h2>הוספת משימה חדשה</h2>
 
-    <!-- פס עליון למשתמש המחובר -->
-    <div id="userGreetingBar" class="user-greeting" style="display:none;">
-        <span id="loggedInUserName">מחובר כ: </span>
-        <div>
-            <button type="button" class="top-link-btn" onclick="openChangePassModal()">החלף סיסמה</button> | 
-            <button type="button" class="top-link-btn" onclick="handleLogout()">החלף משתמש</button>
-        </div>
-    </div>
 
     <form id="taskForm">
+
         
+
     <div class="form-group">
+
     <label class="required" for="taskName">מה המשימה?</label>
+
     <div style="position: relative;">
+
         <input type="text" id="taskName" required placeholder="הקלד/הקלט תיאור משימה..." style="padding-left: 40px;">
+
         <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0;">🔊</button>
+
     </div>
+
 </div>
+
 
         <!-- שם הפרויקט עם חיפוש והקלדה -->
+
         <div class="form-group">
+
             <label class="required" for="projectInput">שם הפרוייקט</label>
+
             <input type="text" id="projectInput" list="projectsList" required placeholder="הקלד או בחר פרויקט...">
+
             <datalist id="projectsList">
+
                 <option value="טוען פרויקטים...">
+
             </datalist>
+
         </div>
+
+
+        <!-- מבקש המשימה עם חיפוש והקלדה -->
+
+        <div class="form-group">
+
+            <label class="required" for="createdByInput">מבקש המשימה</label>
+
+            <input type="text" id="createdByInput" list="usersList1" required placeholder="הקלד או בחר מבקש...">
+
+            <datalist id="usersList1">
+
+                <option value="טוען משתמשים...">
+
+            </datalist>
+
+        </div>
+
 
         <!-- אחראי/ת עם חיפוש והקלדה -->
+
         <div class="form-group">
+
             <label for="personInput">באחריות</label>
+
             <input type="text" id="personInput" list="usersList2" placeholder="הקלד או בחר אחראי/ת...">
+
             <datalist id="usersList2">
+
                 <option value="טוען משתמשים...">
+
             </datalist>
+
         </div>
 
+
         <div class="form-group">
+
             <label for="dueDate">מועד לביצוע</label>
+
             <input type="date" id="dueDate">
+
         </div>
 
+
         <div class="form-group">
+
             <label for="priority">עדיפות</label>
+
             <select id="priority">
+
                 <option value="">ללא עדיפות</option>
+
                 <option value="נמוך">נמוך</option>
+
                 <option value="בינוני" selected>בינוני</option>
+
                 <option value="גבוה">גבוה</option>
+
                 <option value="קריטי">קריטי</option>
+
             </select>
+
         </div>
+
 
         <button type="submit" id="submitBtn">הוסף משימה</button>
+
     </form>
 
+
     <div id="formMessage" class="message"></div>
+
 </div>
 
+
 <script>
+
     const MONDAY_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY2MzM4OTA1MiwiYWFpIjoxMSwidWlkIjoxMDMyMzkyMjEsImlhZCI6IjIwMjYtMDUtMjdUMDU6MDE6MDkuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM0OTk3NTEwLCJyZ24iOiJldWMxIn0.7lm65-gCEmkWPtzTxBpsnzZOf5NEbircT8FiLEnMwx0";
 
+
     const BOARDS_CONFIG = {
+
         permits: {
+
             type: "subitem", 
+
             boardId: "5095918038",
+
             dateCol: "date0",
+
             priorityCol: "color_mm40ejck",
+
             createdByCol: "multiple_person_mm84fek5"
+
         },
+
         plans: {
+
             type: "subitem", 
+
             boardId: "5097101929",
+
             dateCol: "date0",
+
             priorityCol: "color_mm40ejck",
+
             createdByCol: "multiple_person_mm843t5f"
+
         },
+
         projects: {
+
             type: "item", 
+
             boardId: "5105855992",
+
             projectsBoardId: "5097106853",
+
             projectColumnId: "board_relation_mm84qg4p",
+
             dateCol: "date4",
+
             priorityCol: "color_mm83ak5q",
+
             createdByCol: "multiple_person_mm84tjtt"
+
         },
+
         inspection: {
+
             type: "item", 
+
             boardId: "5105969083",
+
             projectsBoardId: "5097106872",
+
             projectColumnId: "board_relation_mm84ngk1",
+
             dateCol: "date4",
+
             priorityCol: "color_mm83ak5q",
+
             createdByCol: "multiple_person_mm846v2t"
+
         }
+
     };
 
-    let currentBoardKey = 'permits';
-    let projectsMap = {}; 
-    let usersMap = {};     
-    let currentUser = null;
 
-    // טעינת הנתונים בעליית הדף בצורה מבוקרת
+    let currentBoardKey = 'permits';
+
+    let projectsMap = {}; // נשמור מיפוי משם הפרויקט ל-ID שלו
+
+    let usersMap = {};     // נשמור מיפוי משם המשתמש ל-ID שלו
+
+
     window.addEventListener('DOMContentLoaded', () => {
-        loadUsersAndInit();
+
+        loadProjectsForCurrentBoard();
+
+        loadUsers();
+
     });
 
-    async function loadUsersAndInit() {
-        const loginSelect = document.getElementById('loginUserSelect');
-        const datalist2 = document.getElementById('usersList2');
-        
-        const query = `{ users(limit: 500) { id name } }`;
-
-        try {
-            const res = await fetch("https://api.monday.com/v2", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": MONDAY_API_KEY
-                },
-                body: JSON.stringify({ query })
-            });
-            const data = await res.json();
-            
-            if (data.data && data.data.users) {
-                const users = data.data.users;
-                users.sort((a, b) => a.name.localeCompare(b.name, 'he'));
-
-                if (loginSelect) loginSelect.innerHTML = '<option value="">בחר את שמך מהרשימה...</option>';
-                if (datalist2) datalist2.innerHTML = '';
-                usersMap = {};
-
-                users.forEach(u => {
-                    usersMap[u.name] = u.id;
-                    
-                    if (loginSelect) {
-                        let optLogin = document.createElement('option');
-                        optLogin.value = u.name;
-                        optLogin.textContent = u.name;
-                        loginSelect.appendChild(optLogin);
-                    }
-
-                    if (datalist2) {
-                        let opt2 = document.createElement('option');
-                        opt2.value = u.name;
-                        datalist2.appendChild(opt2);
-                    }
-                });
-            }
-
-            const savedUser = localStorage.getItem('monday_portal_user');
-            if (savedUser && usersMap[savedUser]) {
-                currentUser = { name: savedUser, id: usersMap[savedUser] };
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('loggedInUserName').textContent = `מחובר כ: ${currentUser.name}`;
-                document.getElementById('userGreetingBar').style.display = 'flex';
-            }
-
-        } catch (err) {
-            console.error("Error loading users:", err);
-            if (loginSelect) loginSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
-        }
-
-        // טעינת הפרויקטים ללוח הנוכחי מיד לאחר טעינת המשתמשים
-        loadProjectsForCurrentBoard();
-    }
-
-    async function loadProjectsForCurrentBoard() {
-        const input = document.getElementById('projectInput');
-        const datalist = document.getElementById('projectsList');
-        if (!input || !datalist) return;
-        
-        input.value = '';
-        datalist.innerHTML = '<option value="טוען פרויקטים...">';
-        projectsMap = {};
-        
-        const config = BOARDS_CONFIG[currentBoardKey];
-        const targetBoardId = config.type === 'item' ? config.projectsBoardId : config.boardId;
-
-        const query = `{
-            boards(ids: [${targetBoardId}]) {
-                items_page(limit: 1000) {
-                    items { id name }
-                }
-            }
-        }`;
-
-        try {
-            const res = await fetch("https://api.monday.com/v2", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": MONDAY_API_KEY
-                },
-                body: JSON.stringify({ query })
-            });
-            const data = await res.json();
-            
-            if (!data.data || !data.data.boards || data.data.boards.length === 0) {
-                datalist.innerHTML = '<option value="אין פרויקטים זמינים">';
-                return;
-            }
-
-            const items = data.data.boards[0].items_page.items;
-            items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
-
-            datalist.innerHTML = '';
-            items.forEach(item => {
-                projectsMap[item.name] = item.id;
-                let opt = document.createElement('option');
-                opt.value = item.name;
-                datalist.appendChild(opt);
-            });
-        } catch (err) {
-            console.error("Error loading projects:", err);
-            datalist.innerHTML = '<option value="שגיאה בטעינת פרויקטים">';
-        }
-    }
-
-    function handleLogin(e) {
-        e.preventDefault();
-        const userName = document.getElementById('loginUserSelect').value;
-        const password = document.getElementById('loginPass').value;
-
-        if (!userName || !usersMap[userName]) {
-            alert("אנא בחר משתמש תקין");
-            return;
-        }
-
-        const customPassKey = 'pwd_' + userName;
-        const savedPassword = localStorage.getItem(customPassKey) || 'nahariya123';
-
-        if (password !== savedPassword) {
-            alert("סיסמה שגויה! (ברירת המחדל היא nahariya123)");
-            return;
-        }
-
-        currentUser = { name: userName, id: usersMap[userName] };
-        localStorage.setItem('monday_portal_user', userName);
-
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('loggedInUserName').textContent = `מחובר כ: ${currentUser.name}`;
-        document.getElementById('userGreetingBar').style.display = 'flex';
-    }
-
-    function handleLogout() {
-        localStorage.removeItem('monday_portal_user');
-        currentUser = null;
-        document.getElementById('loginPass').value = '';
-        document.getElementById('userGreetingBar').style.display = 'none';
-        document.getElementById('loginOverlay').style.display = 'flex';
-    }
-
-    function openChangePassModal() {
-        document.getElementById('oldPass').value = '';
-        document.getElementById('newPass').value = '';
-        document.getElementById('confirmPass').value = '';
-        document.getElementById('changePassModal').style.display = 'flex';
-    }
-
-    function closeChangePassModal() {
-        document.getElementById('changePassModal').style.display = 'none';
-    }
-
-    function handlePasswordChange(e) {
-        e.preventDefault();
-        const oldPass = document.getElementById('oldPass').value;
-        const newPass = document.getElementById('newPass').value;
-        const confirmPass = document.getElementById('confirmPass').value;
-
-        const customPassKey = 'pwd_' + currentUser.name;
-        const currentStoredPass = localStorage.getItem(customPassKey) || 'nahariya123';
-
-        if (oldPass !== currentStoredPass) {
-            alert("הסיסמה הקודמת שהוזנה שגויה.");
-            return;
-        }
-
-        if (newPass !== confirmPass) {
-            alert("הסיסמאות החדשות אינן תואמות.");
-            return;
-        }
-
-        if (newPass.length < 4) {
-            alert("הסיסמה חייבת להכיל לפחות 4 תווים.");
-            return;
-        }
-
-        localStorage.setItem(customPassKey, newPass);
-        alert("הסיסמה שונתה בהצלחה!");
-        closeChangePassModal();
-    }
 
     function switchBoard(boardKey) {
+
         currentBoardKey = boardKey;
+
         
+
         ['permits', 'plans', 'projects', 'inspection'].forEach(key => {
+
             const btnEl = document.getElementById(
+
                 key === 'permits' ? 'btnPermits' :
+
                 key === 'plans' ? 'btnPlans' :
+
                 key === 'projects' ? 'btnProjects' : 'btnInspection'
+
             );
+
             if (btnEl) {
+
                 btnEl.classList.toggle('active', key === boardKey);
+
             }
+
         });
 
+
         loadProjectsForCurrentBoard();
+
     }
 
-    document.getElementById('taskForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        if (!currentUser) {
-            alert("יש להתחבר למערכת מחדש");
-            handleLogout();
-            return;
-        }
 
-        const btn = document.getElementById('submitBtn');
-        const msg = document.getElementById('formMessage');
+    async function loadProjectsForCurrentBoard() {
+
+        const input = document.getElementById('projectInput');
+
+        const datalist = document.getElementById('projectsList');
+
+        if (!input || !datalist) return;
+
         
-        btn.disabled = true;
-        btn.textContent = 'שולח משימה...';
+
+        input.value = '';
+
+        datalist.innerHTML = '<option value="טוען פרויקטים...">';
+
+        projectsMap = {};
+
+        
 
         const config = BOARDS_CONFIG[currentBoardKey];
 
+        const targetBoardId = config.type === 'item' ? config.projectsBoardId : config.boardId;
+
+
+        const query = `{
+
+            boards(ids: [${targetBoardId}]) {
+
+                items_page(limit: 500) {
+
+                    items { id name }
+
+                }
+
+            }
+
+        }`;
+
+
+        try {
+
+            const res = await fetch("https://api.monday.com/v2", {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type": "application/json",
+
+                    "Authorization": MONDAY_API_KEY
+
+                },
+
+                body: JSON.stringify({ query })
+
+            });
+
+            const data = await res.json();
+
+            
+
+            if (!data.data || !data.data.boards || data.data.boards.length === 0) {
+
+                datalist.innerHTML = '<option value="אין פרויקטים זמינים">';
+
+                return;
+
+            }
+
+
+            const items = data.data.boards[0].items_page.items;
+
+            items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+
+
+            datalist.innerHTML = '';
+
+            items.forEach(item => {
+
+                projectsMap[item.name] = item.id;
+
+                let opt = document.createElement('option');
+
+                opt.value = item.name;
+
+                datalist.appendChild(opt);
+
+            });
+
+        } catch (err) {
+
+            console.error("Error loading projects:", err);
+
+            datalist.innerHTML = '<option value="שגיאה בטעינת פרויקטים">';
+
+        }
+
+    }
+
+
+    async function loadUsers() {
+
+        const datalist1 = document.getElementById('usersList1');
+
+        const datalist2 = document.getElementById('usersList2');
+
+        if (!datalist1 || !datalist2) return;
+
+
+        const query = `{ users(limit: 500) { id name } }`;
+
+
+        try {
+
+            const res = await fetch("https://api.monday.com/v2", {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type": "application/json",
+
+                    "Authorization": MONDAY_API_KEY
+
+                },
+
+                body: JSON.stringify({ query })
+
+            });
+
+            const data = await res.json();
+
+            
+
+            if (!data.data || !data.data.users) return;
+
+            
+
+            const users = data.data.users;
+
+            users.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+
+
+            datalist1.innerHTML = '';
+
+            datalist2.innerHTML = '';
+
+            usersMap = {};
+
+
+            users.forEach(u => {
+
+                usersMap[u.name] = u.id;
+
+                
+
+                let opt1 = document.createElement('option');
+
+                opt1.value = u.name;
+
+                datalist1.appendChild(opt1);
+
+
+                let opt2 = document.createElement('option');
+
+                opt2.value = u.name;
+
+                datalist2.appendChild(opt2);
+
+            });
+
+        } catch (err) {
+
+            console.error("Error loading users:", err);
+
+        }
+
+    }
+
+
+    document.getElementById('taskForm').addEventListener('submit', async function(e) {
+
+        e.preventDefault();
+
+        
+
+        const btn = document.getElementById('submitBtn');
+
+        const msg = document.getElementById('formMessage');
+
+        
+
+        btn.disabled = true;
+
+        btn.textContent = 'שולח משימה...';
+
+
+        const config = BOARDS_CONFIG[currentBoardKey];
+
+
         const taskName = document.getElementById('taskName').value;
+
         const projectName = document.getElementById('projectInput').value;
+
+        const createdByName = document.getElementById('createdByInput').value;
+
         const personName = document.getElementById('personInput').value;
+
         const dueDate = document.getElementById('dueDate').value;
+
         const priority = document.getElementById('priority').value;
 
+
+        // המרת שמות בחזרה ל-IDs של Monday באמצעות המיפויים
+
         const projectId = projectsMap[projectName];
-        const createdById = currentUser.id; 
+
+        const createdById = usersMap[createdByName];
+
         const personId = usersMap[personName];
 
+
         if (config.type === 'item' && !projectId) {
+
             alert("אנא בחרי פרויקט תקין מהרשימה");
+
             btn.disabled = false;
+
             btn.textContent = 'הוסף משימה';
+
             return;
+
         }
+
 
         const columnValues = {};
+
         
+
         if (config.type === 'item') {
+
             if (projectId) {
+
                 columnValues[config.projectColumnId] = { item_ids: [parseInt(projectId)] };
+
             }
+
         }
+
 
         if (createdById && config.createdByCol) {
+
             columnValues[config.createdByCol] = { personsAndTeams: [{ id: parseInt(createdById), kind: "person" }] };
+
         }
 
+
         if (personId) {
+
             columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
+
         }
+
         if (dueDate) {
+
             columnValues[config.dateCol] = { date: dueDate };
+
         }
+
         if (priority) {
+
             columnValues[config.priorityCol] = { label: priority };
+
         }
+
 
         let query = '';
 
+
         if (config.type === 'item') {
+
             query = `mutation {
+
                 create_item (
+
                     board_id: ${config.boardId},
+
                     item_name: "${taskName.replace(/"/g, '\\"')}",
+
                     column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
+
                 ) {
+
                     id
+
                 }
+
             }`;
+
         } else {
+
             query = `mutation {
+
                 create_subitem (
+
                     parent_item_id: ${projectId},
+
                     item_name: "${taskName.replace(/"/g, '\\"')}",
+
                     column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
+
                 ) {
+
                     id
+
                 }
+
             }`;
+
         }
 
+
         try {
+
             const res = await fetch("https://api.monday.com/v2", {
+
                 method: "POST",
+
                 headers: {
+
                     "Content-Type": "application/json",
+
                     "Authorization": MONDAY_API_KEY
+
                 },
+
                 body: JSON.stringify({ query })
+
             });
+
 
             const result = await res.json();
 
+
             if (result.errors) {
+
                 console.error("Monday API Error:", result.errors);
+
                 alert("שגיאה ממאנדיי: " + result.errors[0].message);
+
                 throw new Error(result.errors[0].message);
+
             }
 
+
             msg.textContent = 'המשימה נוספה בהצלחה למאנדיי!';
+
             msg.className = 'message success';
+
             msg.style.display = 'block';
+
             
+
             document.getElementById('taskForm').reset();
+
             switchBoard(currentBoardKey);
+
         } catch (err) {
+
             msg.textContent = 'שגיאה בשליחת המשימה. נסי שוב.';
+
             msg.className = 'message error';
+
             msg.style.display = 'block';
+
         } finally {
+
             btn.disabled = false;
+
             btn.textContent = 'הוסף משימה';
+
             setTimeout(() => { msg.style.display = 'none'; }, 4000);
+
         }
+
     });
 
+
     function toggleSpeechRecognition() {
+
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
         if (!SpeechRecognition) {
+
             alert("הדפדפן שלך לא תומך בהקלטה קולית. נסה להשתמש ב-Chrome או Safari.");
+
             return;
+
         }
 
+
         const recognition = new SpeechRecognition();
+
         recognition.lang = 'he-IL';
+
         recognition.interimResults = false;
+
         recognition.maxAlternatives = 1;
 
+
         const micBtn = document.getElementById('micBtn');
+
         const taskInput = document.getElementById('taskName');
+
 
         micBtn.innerText = "🔴";
 
+
         recognition.onresult = function(event) {
+
             const speechText = event.results[0][0].transcript;
+
             taskInput.value = speechText;
+
             micBtn.innerText = "🔊";
+
         };
+
 
         recognition.onerror = function(event) {
+
             console.error("שגיאה בזיהוי קולי:", event.error);
+
             micBtn.innerText = "🔊";
+
         };
+
 
         recognition.onend = function() {
+
             micBtn.innerText = "🔊";
+
         };
 
+
         recognition.start();
+
     }
+
 </script>
 
+
 </body>
-</html>
+
+</html> 

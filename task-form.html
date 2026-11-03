@@ -339,13 +339,13 @@
     let usersMap = {};     
     let currentUser = null;
 
-    // טעינת הנתונים מיד עם עליית הדף בצורה נפרדת ובטוחה
+    // טעינת הנתונים בעליית הדף בצורה בטוחה וישירה
     window.addEventListener('DOMContentLoaded', () => {
-        loadUsersAndLoginState();
+        loadUsers();
         loadProjectsForCurrentBoard();
     });
 
-    async function loadUsersAndLoginState() {
+    async function loadUsers() {
         const loginSelect = document.getElementById('loginUserSelect');
         const datalist2 = document.getElementById('usersList2');
         if (!loginSelect || !datalist2) return;

@@ -100,7 +100,7 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
         }
-        button[type="submit"] {
+        button[type="submit"], .action-btn {
             font-family: 'Rubik', sans-serif;
             width: 100%;
             background-color: #0073ea;
@@ -114,7 +114,7 @@
             transition: background-color 0.2s;
             margin-top: 10px;
         }
-        button[type="submit"]:hover {
+        button[type="submit"]:hover, .action-btn:hover {
             background-color: #0060b9;
         }
         button[type="submit"]:disabled {
@@ -137,9 +137,96 @@
             background-color: #f8d7da;
             color: #842029;
         }
+        /* מסכי שכבה (Overlay) להצגה והחלפת סיסמה */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .user-greeting {
+            background: #e1f5fe;
+            color: #01579b;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .top-link-btn {
+            background: none;
+            border: none;
+            color: #0277bd;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.85rem;
+            font-family: 'Rubik', sans-serif;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
+
+    <!-- מסך התחברות בכניסה הראשונה -->
+    <div id="loginOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h2>התחברות לפורטל</h2>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">בחר את שמך והזן סיסמה</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group" style="text-align: right;">
+                    <label class="required" for="loginUserSelect">שם משתמש (מהמאנדיי)</label>
+                    <select id="loginUserSelect" required>
+                        <option value="">טוען משתמשים...</option>
+                    </select>
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label class="required" for="loginPass">סיסמה</label>
+                    <input type="password" id="loginPass" required placeholder="הזן סיסמה (ברירת מחדל: nahariya123)">
+                </div>
+                <button type="submit" class="action-btn">התחבר</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- חלון קטן להחלפת סיסמה -->
+    <div id="changePassModal" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <h2>החלפת סיסמה</h2>
+            <form onsubmit="handlePasswordChange(event)">
+                <div class="form-group" style="text-align: right;">
+                    <label class="required" for="oldPass">סיסמה קודמת</label>
+                    <input type="password" id="oldPass" required placeholder="הקלידי סיסמה קודמת...">
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label class="required" for="newPass">סיסמה חדשה</label>
+                    <input type="password" id="newPass" required placeholder="הקלידי סיסמה חדשה...">
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label class="required" for="confirmPass">אימות סיסמה חדשה</label>
+                    <input type="password" id="confirmPass" required placeholder="הקלידי שוב סיסמה חדשה...">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button type="button" class="action-btn" style="background-color: #6c757d;" onclick="closeChangePassModal()">ביטול</button>
+                    <button type="submit" class="action-btn">אישור</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="tabs-wrapper">
         <button type="button" class="tab-btn active" id="btnPermits" onclick="switchBoard('permits')">היתרי בניה</button>
@@ -150,6 +237,15 @@
 
 <div class="form-container">
     <h2>הוספת משימה חדשה</h2>
+
+    <!-- פס עליון למשתמש המחובר ואפשרות החלפת סיסמה / החלפת משתמש -->
+    <div id="userGreetingBar" class="user-greeting" style="display:none;">
+        <span id="loggedInUserName">מחובר כ: </span>
+        <div>
+            <button type="button" class="top-link-btn" onclick="openChangePassModal()">החלף סיסמה</button> | 
+            <button type="button" class="top-link-btn" onclick="handleLogout()">החלף משתמש</button>
+        </div>
+    </div>
 
     <form id="taskForm">
         
@@ -170,14 +266,7 @@
             </datalist>
         </div>
 
-        <!-- מבקש המשימה עם חיפוש והקלדה -->
-        <div class="form-group">
-            <label class="required" for="createdByInput">מבקש המשימה</label>
-            <input type="text" id="createdByInput" list="usersList1" required placeholder="הקלד או בחר מבקש...">
-            <datalist id="usersList1">
-                <option value="טוען משתמשים...">
-            </datalist>
-        </div>
+        <!-- מבקש המשימה מנוהל אוטומטית לפי המשתמש המחובר -->
 
         <!-- אחראי/ת עם חיפוש והקלדה -->
         <div class="form-group">
@@ -251,11 +340,143 @@
     let currentBoardKey = 'permits';
     let projectsMap = {}; 
     let usersMap = {};     
+    let currentUser = null;
 
     window.addEventListener('DOMContentLoaded', () => {
-        loadProjectsForCurrentBoard();
-        loadUsers();
+        loadAllDataForLoginAndForm();
     });
+
+    async function loadAllDataForLoginAndForm() {
+        const loginSelect = document.getElementById('loginUserSelect');
+        const datalist2 = document.getElementById('usersList2');
+
+        const query = `{ users(limit: 500) { id name } }`;
+
+        try {
+            const res = await fetch("https://api.monday.com/v2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": MONDAY_API_KEY
+                },
+                body: JSON.stringify({ query })
+            });
+            const data = await res.json();
+            
+            if (data.data && data.data.users) {
+                const users = data.data.users;
+                users.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+
+                loginSelect.innerHTML = '<option value="">בחר את שמך מהרשימה...</option>';
+                datalist2.innerHTML = '';
+                usersMap = {};
+
+                users.forEach(u => {
+                    usersMap[u.name] = u.id;
+                    
+                    let optLogin = document.createElement('option');
+                    optLogin.value = u.name;
+                    optLogin.textContent = u.name;
+                    loginSelect.appendChild(optLogin);
+
+                    let opt2 = document.createElement('option');
+                    opt2.value = u.name;
+                    datalist2.appendChild(opt2);
+                });
+            }
+
+            // בדיקה אם המשתמש כבר מחובר בדפדפן
+            const savedUser = localStorage.getItem('monday_portal_user');
+            if (savedUser && usersMap[savedUser]) {
+                currentUser = { name: savedUser, id: usersMap[savedUser] };
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('loggedInUserName').textContent = `מחובר כ: ${currentUser.name}`;
+                document.getElementById('userGreetingBar').style.display = 'flex';
+                loadProjectsForCurrentBoard();
+            }
+
+        } catch (err) {
+            console.error("Error loading users:", err);
+            loginSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
+        }
+    }
+
+    function handleLogin(e) {
+        e.preventDefault();
+        const userName = document.getElementById('loginUserSelect').value;
+        const password = document.getElementById('loginPass').value;
+
+        if (!userName || !usersMap[userName]) {
+            alert("אנא בחר משתמש תקין");
+            return;
+        }
+
+        // בדיקת סיסמה (ברירת מחדל nahariya123 או סיסמה אישית ששמורה בלוטות' / LocalStorage)
+        const customPassKey = 'pwd_' + userName;
+        const savedPassword = localStorage.getItem(customPassKey) || 'nahariya123';
+
+        if (password !== savedPassword) {
+            alert("סיסמה שגויה! (ברירת המחדל היא nahariya123)");
+            return;
+        }
+
+        currentUser = { name: userName, id: usersMap[userName] };
+        localStorage.setItem('monday_portal_user', userName);
+
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('loggedInUserName').textContent = `מחובר כ: ${currentUser.name}`;
+        document.getElementById('userGreetingBar').style.display = 'flex';
+
+        loadProjectsForCurrentBoard();
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('monday_portal_user');
+        currentUser = null;
+        document.getElementById('loginPass').value = '';
+        document.getElementById('userGreetingBar').style.display = 'none';
+        document.getElementById('loginOverlay').style.display = 'flex';
+    }
+
+    function openChangePassModal() {
+        document.getElementById('oldPass').value = '';
+        document.getElementById('newPass').value = '';
+        document.getElementById('confirmPass').value = '';
+        document.getElementById('changePassModal').style.display = 'flex';
+    }
+
+    function closeChangePassModal() {
+        document.getElementById('changePassModal').style.display = 'none';
+    }
+
+    function handlePasswordChange(e) {
+        e.preventDefault();
+        const oldPass = document.getElementById('oldPass').value;
+        const newPass = document.getElementById('newPass').value;
+        const confirmPass = document.getElementById('confirmPass').value;
+
+        const customPassKey = 'pwd_' + currentUser.name;
+        const currentStoredPass = localStorage.getItem(customPassKey) || 'nahariya123';
+
+        if (oldPass !== currentStoredPass) {
+            alert("הסיסמה הקודמת שהוזנה שגויה.");
+            return;
+        }
+
+        if (newPass !== confirmPass) {
+            alert("הסיסמאות החדשות אינן תואמות.");
+            return;
+        }
+
+        if (newPass.length < 4) {
+            alert("הסיסמה חייבת להכיל לפחות 4 תווים.");
+            return;
+        }
+
+        localStorage.setItem(customPassKey, newPass);
+        alert("הסיסמה שונתה בהצלחה!");
+        closeChangePassModal();
+    }
 
     function switchBoard(boardKey) {
         currentBoardKey = boardKey;
@@ -326,52 +547,15 @@
         }
     }
 
-    async function loadUsers() {
-        const datalist1 = document.getElementById('usersList1');
-        const datalist2 = document.getElementById('usersList2');
-        if (!datalist1 || !datalist2) return;
-
-        const query = `{ users(limit: 500) { id name } }`;
-
-        try {
-            const res = await fetch("https://api.monday.com/v2", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": MONDAY_API_KEY
-                },
-                body: JSON.stringify({ query })
-            });
-            const data = await res.json();
-            
-            if (!data.data || !data.data.users) return;
-            
-            const users = data.data.users;
-            users.sort((a, b) => a.name.localeCompare(b.name, 'he'));
-
-            datalist1.innerHTML = '';
-            datalist2.innerHTML = '';
-            usersMap = {};
-
-            users.forEach(u => {
-                usersMap[u.name] = u.id;
-                
-                let opt1 = document.createElement('option');
-                opt1.value = u.name;
-                datalist1.appendChild(opt1);
-
-                let opt2 = document.createElement('option');
-                opt2.value = u.name;
-                datalist2.appendChild(opt2);
-            });
-        } catch (err) {
-            console.error("Error loading users:", err);
-        }
-    }
-
     document.getElementById('taskForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        if (!currentUser) {
+            alert("יש להתחבר למערכת מחדש");
+            handleLogout();
+            return;
+        }
+
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('formMessage');
         
@@ -382,13 +566,12 @@
 
         const taskName = document.getElementById('taskName').value;
         const projectName = document.getElementById('projectInput').value;
-        const createdByName = document.getElementById('createdByInput').value;
         const personName = document.getElementById('personInput').value;
         const dueDate = document.getElementById('dueDate').value;
         const priority = document.getElementById('priority').value;
 
         const projectId = projectsMap[projectName];
-        const createdById = usersMap[createdByName];
+        const createdById = currentUser.id; // המשתמש המחובר נשלח אוטומטית כמבקש המשימה
         const personId = usersMap[personName];
 
         if (config.type === 'item' && !projectId) {

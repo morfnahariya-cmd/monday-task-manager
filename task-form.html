@@ -137,7 +137,6 @@
             background-color: #f8d7da;
             color: #842029;
         }
-        /* מסכי שכבה (Overlay) להצגה והחלפת סיסמה */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -203,7 +202,7 @@
         </div>
     </div>
 
-    <!-- חלון קטן להחלפת סיסמה -->
+    <!-- חלון להחלפת סיסמה -->
     <div id="changePassModal" class="modal-overlay" style="display: none;">
         <div class="modal-box">
             <h2>החלפת סיסמה</h2>
@@ -238,7 +237,7 @@
 <div class="form-container">
     <h2>הוספת משימה חדשה</h2>
 
-    <!-- פס עליון למשתמש המחובר ואפשרות החלפת סיסמה / החלפת משתמש -->
+    <!-- פס עליון למשתמש המחובר -->
     <div id="userGreetingBar" class="user-greeting" style="display:none;">
         <span id="loggedInUserName">מחובר כ: </span>
         <div>
@@ -265,8 +264,6 @@
                 <option value="טוען פרויקטים...">
             </datalist>
         </div>
-
-        <!-- מבקש המשימה מנוהל אוטומטית לפי המשתמש המחובר -->
 
         <!-- אחראי/ת עם חיפוש והקלדה -->
         <div class="form-group">
@@ -343,10 +340,11 @@
     let currentUser = null;
 
     window.addEventListener('DOMContentLoaded', () => {
-        loadAllDataForLoginAndForm();
+        loadUsers();
+        loadProjectsForCurrentBoard();
     });
 
-    async function loadAllDataForLoginAndForm() {
+    async function loadUsers() {
         const loginSelect = document.getElementById('loginUserSelect');
         const datalist2 = document.getElementById('usersList2');
 
@@ -385,19 +383,69 @@
                 });
             }
 
-            // בדיקה אם המשתמש כבר מחובר בדפדפן
             const savedUser = localStorage.getItem('monday_portal_user');
             if (savedUser && usersMap[savedUser]) {
                 currentUser = { name: savedUser, id: usersMap[savedUser] };
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('loggedInUserName').textContent = `מחובר כ: ${currentUser.name}`;
                 document.getElementById('userGreetingBar').style.display = 'flex';
-                loadProjectsForCurrentBoard();
             }
 
         } catch (err) {
             console.error("Error loading users:", err);
             loginSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
+        }
+    }
+
+    async function loadProjectsForCurrentBoard() {
+        const input = document.getElementById('projectInput');
+        const datalist = document.getElementById('projectsList');
+        if (!input || !datalist) return;
+        
+        input.value = '';
+        datalist.innerHTML = '<option value="טוען פרויקטים...">';
+        projectsMap = {};
+        
+        const config = BOARDS_CONFIG[currentBoardKey];
+        const targetBoardId = config.type === 'item' ? config.projectsBoardId : config.boardId;
+
+        const query = `{
+            boards(ids: [${targetBoardId}]) {
+                items_page(limit: 1000) {
+                    items { id name }
+                }
+            }
+        }`;
+
+        try {
+            const res = await fetch("https://api.monday.com/v2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": MONDAY_API_KEY
+                },
+                body: JSON.stringify({ query })
+            });
+            const data = await res.json();
+            
+            if (!data.data || !data.data.boards || data.data.boards.length === 0) {
+                datalist.innerHTML = '<option value="אין פרויקטים זמינים">';
+                return;
+            }
+
+            const items = data.data.boards[0].items_page.items;
+            items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+
+            datalist.innerHTML = '';
+            items.forEach(item => {
+                projectsMap[item.name] = item.id;
+                let opt = document.createElement('option');
+                opt.value = item.name;
+                datalist.appendChild(opt);
+            });
+        } catch (err) {
+            console.error("Error loading projects:", err);
+            datalist.innerHTML = '<option value="שגיאה בטעינת פרויקטים">';
         }
     }
 
@@ -411,7 +459,6 @@
             return;
         }
 
-        // בדיקת סיסמה (ברירת מחדל nahariya123 או סיסמה אישית ששמורה בלוטות' / LocalStorage)
         const customPassKey = 'pwd_' + userName;
         const savedPassword = localStorage.getItem(customPassKey) || 'nahariya123';
 
@@ -426,8 +473,6 @@
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('loggedInUserName').textContent = `מחובר כ: ${currentUser.name}`;
         document.getElementById('userGreetingBar').style.display = 'flex';
-
-        loadProjectsForCurrentBoard();
     }
 
     function handleLogout() {
@@ -495,58 +540,6 @@
         loadProjectsForCurrentBoard();
     }
 
-    async function loadProjectsForCurrentBoard() {
-        const input = document.getElementById('projectInput');
-        const datalist = document.getElementById('projectsList');
-        if (!input || !datalist) return;
-        
-        input.value = '';
-        datalist.innerHTML = '<option value="טוען פרויקטים...">';
-        projectsMap = {};
-        
-        const config = BOARDS_CONFIG[currentBoardKey];
-        const targetBoardId = config.type === 'item' ? config.projectsBoardId : config.boardId;
-
-        const query = `{
-            boards(ids: [${targetBoardId}]) {
-                items_page(limit: 1000) {
-                    items { id name }
-                }
-            }
-        }`;
-
-        try {
-            const res = await fetch("https://api.monday.com/v2", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": MONDAY_API_KEY
-                },
-                body: JSON.stringify({ query })
-            });
-            const data = await res.json();
-            
-            if (!data.data || !data.data.boards || data.data.boards.length === 0) {
-                datalist.innerHTML = '<option value="אין פרויקטים זמינים">';
-                return;
-            }
-
-            const items = data.data.boards[0].items_page.items;
-            items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
-
-            datalist.innerHTML = '';
-            items.forEach(item => {
-                projectsMap[item.name] = item.id;
-                let opt = document.createElement('option');
-                opt.value = item.name;
-                datalist.appendChild(opt);
-            });
-        } catch (err) {
-            console.error("Error loading projects:", err);
-            datalist.innerHTML = '<option value="שגיאה בטעינת פרויקטים">';
-        }
-    }
-
     document.getElementById('taskForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -571,7 +564,7 @@
         const priority = document.getElementById('priority').value;
 
         const projectId = projectsMap[projectName];
-        const createdById = currentUser.id; // המשתמש המחובר נשלח אוטומטית כמבקש המשימה
+        const createdById = currentUser.id; 
         const personId = usersMap[personName];
 
         if (config.type === 'item' && !projectId) {

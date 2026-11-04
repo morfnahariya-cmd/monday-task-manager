@@ -29,29 +29,38 @@
             position: relative;
             z-index: 10;
         }
+        
+        /* כפתורי הלוחות העליונים בעיצוב תלת-ממד, זכוכית ושמירת גוונים מקוריים */
         .tab-btn {
             font-family: 'Rubik', sans-serif;
             background-color: #ffffff;
             color: #323338;
-            border: 2px solid #e1e1e6;
+            border: 1px solid rgba(255, 255, 255, 0.6);
             padding: 10px 18px;
             border-radius: 25px;
             font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.8),
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(4px);
         }
         .tab-btn:hover {
             border-color: #0073ea;
             color: #0073ea;
+            transform: translateY(-1px);
         }
         .tab-btn.active {
-            background-color: #0073ea;
+            background: linear-gradient(135deg, #1e90ff 0%, #0060b9 100%);
             color: white;
-            border-color: #0073ea;
-            box-shadow: 0 4px 10px rgba(0, 115, 234, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 6px 16px rgba(0, 115, 234, 0.35),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.5),
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.2);
         }
+
         .form-container {
             background: #ffffff;
             padding: 25px;
@@ -101,7 +110,7 @@
             box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
         }
         
-        /* עיצוב בלוני Bubblegum תלת-ממדיים עם נגיעת כחול עדינה */
+        /* עיצוב בלוני Bubblegum תלת-ממדיים */
         .tags-input-container {
             border: 1px solid #c3c6d4;
             border-radius: 8px;
@@ -241,34 +250,34 @@
             align-items: center;
         }
 
-        /* כפתור 3D עם גווני ירוק עשירים, עמוקים ומדויקים כמו באפליקציה של רביטל */
+        /* כפתור שם המשתמש: מוקטן, גווני ירוק בהירים יותר עם גרדיאנט ואפקט זכוכית ותלת-ממד */
         .user-badge-btn {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
-            background: linear-gradient(135deg, #00875a 0%, #005c3d 100%);
+            gap: 10px;
+            background: linear-gradient(135deg, #00b074 0%, #007d52 100%);
             color: white;
-            padding: 9px 18px;
-            border-radius: 30px;
+            padding: 6px 14px;
+            border-radius: 25px;
             font-family: 'Rubik', sans-serif;
-            font-weight: 700;
-            font-size: 0.95rem;
-            box-shadow: 0 8px 20px rgba(0, 110, 70, 0.35), 
-                        0 3px 8px rgba(0, 0, 0, 0.15),
-                        inset 0 2px 4px rgba(255, 255, 255, 0.4), 
-                        inset 0 -3px 6px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.35);
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 6px 16px rgba(0, 140, 90, 0.3), 
+                        0 2px 6px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 3px rgba(255, 255, 255, 0.5), 
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(6px);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
         /* אנימציית העיגול הלבן (Pulse) */
         .pulse-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background-color: #ffffff;
             border-radius: 50%;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
             animation: revitalPulse 1.6s infinite ease-in-out;
         }
 
@@ -279,7 +288,7 @@
             }
             50% {
                 transform: scale(1.35);
-                box-shadow: 0 0 0 6px rgba(255, 255, 255, 0);
+                box-shadow: 0 0 0 5px rgba(255, 255, 255, 0);
             }
             100% {
                 transform: scale(0.85);
@@ -400,7 +409,7 @@
     </div>
 
 <div class="form-container">
-    <!-- פס עליון עם כפתור 3D בצבעים עשירים ומדויקים -->
+    <!-- פס עליון עם כפתור מוקטן, מואר ומעוצב -->
     <div id="userGreetingBar" class="user-greeting" style="display:none;">
         <div class="user-badge-btn">
             <div class="pulse-dot"></div>
@@ -998,7 +1007,7 @@
             msg.className = 'message success';
             msg.style.display = 'block';
             
-            document.getElementById('taskForm').reset();
+            document.getElementById('taskForm'].reset();
             selectedProjects = [];
             selectedPersons = [];
             renderProjectTags();

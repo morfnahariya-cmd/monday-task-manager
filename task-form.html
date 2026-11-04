@@ -134,7 +134,7 @@
                         inset 0 -2px 4px rgba(0, 115, 234, 0.05);
             margin: 10px;
         }
-        /* מיקום מדויק בפינה הימנית-עליונה בדיוק לפי הנקודה שלך */
+        /* מיקום מושלם בדיוק בפינה הימנית-עליונה לפי הנקודה */
         .tag-remove {
             position: absolute;
             top: -5px;
@@ -591,7 +591,8 @@
             const data = await res.json();
             
             if (data.data && data.data.users) {
-                allUsersList = data.data.users;
+                // מסנן החוצה את המשתמשת הספציפית "Megan" שמגיעה משום מה מה-API של מאנדיי
+                allUsersList = data.data.users.filter(u => u.name.trim() !== "Megan");
                 allUsersList.sort((a, b) => a.name.localeCompare(b.name, 'he'));
 
                 usersMap = {};
@@ -946,7 +947,7 @@
             msg.className = 'message success';
             msg.style.display = 'block';
             
-            document.getElementById('taskForm').reset();
+            document.getElementById('taskForm'].reset();
             selectedProjects = [];
             selectedPersons = [];
             renderProjectTags();

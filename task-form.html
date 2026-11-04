@@ -200,11 +200,11 @@
 </head>
 <body>
 
-    <!-- מסך הגדרת סיסמה ראשונית -->
+    <!-- מסך הגדרת סיסמא ראשונית -->
     <div id="setupOverlay" class="modal-overlay" style="display: none;">
         <div class="modal-box">
             <button type="button" class="back-arrow-btn" onclick="closeSetupModal()">חזור ➔</button>
-            <h2>הגדרת סיסמה ראשונית</h2>
+            <h2>הגדרת סיסמא ראשונית</h2>
             <form onsubmit="handleSetupPassword(event)">
                 <div class="form-group" style="text-align: right;">
                     <label class="required" for="setupUserSelect">שם משתמש</label>
@@ -213,14 +213,14 @@
                     </select>
                 </div>
                 <div class="form-group" style="text-align: right;">
-                    <label class="required" for="setupPass">הגדרת סיסמה</label>
-                    <input type="password" id="setupPass" required placeholder="הזן סיסמה חדשה...">
+                    <label class="required" for="setupPass">הגדרת סיסמא</label>
+                    <input type="password" id="setupPass" required placeholder="הזן סיסמא חדשה...">
                 </div>
                 <div class="form-group" style="text-align: right;">
-                    <label class="required" for="setupConfirmPass">אימות סיסמה</label>
-                    <input type="password" id="setupConfirmPass" required placeholder="הזן שוב את הסיסמה...">
+                    <label class="required" for="setupConfirmPass">אימות סיסמא</label>
+                    <input type="password" id="setupConfirmPass" required placeholder="הזן שוב את הסיסמא...">
                 </div>
-                <button type="submit" class="action-btn">שמור סיסמה</button>
+                <button type="submit" class="action-btn">שמור סיסמא</button>
             </form>
         </div>
     </div>
@@ -237,33 +237,33 @@
                     </select>
                 </div>
                 <div class="form-group" style="text-align: right;">
-                    <label class="required" for="loginPass">סיסמה</label>
-                    <input type="password" id="loginPass" required placeholder="הזן סיסמה...">
+                    <label class="required" for="loginPass">סיסמא</label>
+                    <input type="password" id="loginPass" required placeholder="הזן סיסמא...">
                 </div>
                 <button type="submit" class="action-btn">התחבר</button>
             </form>
             <div style="margin-top: 15px;" id="setupLinkContainer">
-                <button type="button" class="top-link-btn" onclick="switchToSetupModal()">עדיין לא הגדרת סיסמה? לחץ כאן</button>
+                <button type="button" class="top-link-btn" onclick="switchToSetupModal()">עדיין לא הגדרת סיסמא? לחץ כאן</button>
             </div>
         </div>
     </div>
 
-    <!-- חלון להחלפת סיסמה -->
+    <!-- חלון להחלפת סיסמא -->
     <div id="changePassModal" class="modal-overlay" style="display: none;">
         <div class="modal-box">
-            <h2>החלפת סיסמה</h2>
+            <h2>החלפת סיסמא</h2>
             <form onsubmit="handlePasswordChange(event)">
                 <div class="form-group" style="text-align: right;">
-                    <label class="required" for="oldPass">סיסמה קודמת</label>
-                    <input type="password" id="oldPass" required placeholder="הקלד סיסמה קודמת...">
+                    <label class="required" for="oldPass">סיסמא קודמת</label>
+                    <input type="password" id="oldPass" required placeholder="הקלד סיסמא קודמת...">
                 </div>
                 <div class="form-group" style="text-align: right;">
-                    <label class="required" for="newPass">סיסמה חדשה</label>
-                    <input type="password" id="newPass" required placeholder="הקלד סיסמה חדשה...">
+                    <label class="required" for="newPass">סיסמא חדשה</label>
+                    <input type="password" id="newPass" required placeholder="הקלד סיסמא חדשה...">
                 </div>
                 <div class="form-group" style="text-align: right;">
-                    <label class="required" for="confirmPass">אימות סיסמה חדשה</label>
-                    <input type="password" id="confirmPass" required placeholder="הקלד שוב סיסמה חדשה...">
+                    <label class="required" for="confirmPass">אימות סיסמא חדשה</label>
+                    <input type="password" id="confirmPass" required placeholder="הקלד שוב סיסמא חדשה...">
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
                     <button type="submit" class="action-btn" style="order: 2;">אישור</button>
@@ -285,7 +285,7 @@
     <div id="userGreetingBar" class="user-greeting" style="display:none;">
         <span id="loggedInUserName">מחובר כ: </span>
         <div>
-            <button type="button" class="top-link-btn" onclick="openChangePassModal()">החלף סיסמה</button>|<button type="button" class="top-link-btn" onclick="handleLogout()">החלף משתמש</button>
+            <button type="button" class="top-link-btn" onclick="openChangePassModal()">החלף סיסמא</button>|<button type="button" class="top-link-btn" onclick="handleLogout()">החלף משתמש</button>
         </div>
     </div>
 
@@ -415,7 +415,6 @@
                 populateUserDropdowns();
             }
 
-            // זכירת התחברות קבועה במכשיר
             const savedUser = localStorage.getItem('monday_portal_user');
             if (savedUser && usersMap[savedUser]) {
                 currentUser = { name: savedUser, id: usersMap[savedUser] };
@@ -446,7 +445,6 @@
         allUsersList.forEach(u => {
             const hasPassword = localStorage.getItem('pwd_' + u.name);
 
-            // הוספה לרשימת התחברות (כל השמשתמשים מופיעים כאן)
             if (loginSelect) {
                 let optLogin = document.createElement('option');
                 optLogin.value = u.name;
@@ -454,7 +452,6 @@
                 loginSelect.appendChild(optLogin);
             }
 
-            // הוספה לרשימת הגדרת סיסמה ראשונית רק אם עדיין אין לו סיסמה
             if (!hasPassword && setupSelect) {
                 let optSetup = document.createElement('option');
                 optSetup.value = u.name;
@@ -462,7 +459,6 @@
                 setupSelect.appendChild(optSetup);
             }
 
-            // שדה אחריות בטופס הראשי
             if (datalist2) {
                 let opt2 = document.createElement('option');
                 opt2.value = u.name;
@@ -475,7 +471,6 @@
         if (!userName) return;
         const savedPassword = localStorage.getItem('pwd_' + userName);
         if (!savedPassword) {
-            // אם למשתמש הנבחר אין עדיין סיסמה, נעביר אותו למסך הגדרת סיסמה ראשונית
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('setupUserSelect').value = userName;
             document.getElementById('setupOverlay').style.display = 'flex';
@@ -510,12 +505,12 @@
         }
 
         if (pass.length < 4) {
-            alert("הסיסמה חייבת להכיל לפחות 4 תווים");
+            alert("הסיסמא חייבת להכיל לפחות 4 תווים");
             return;
         }
 
         localStorage.setItem('pwd_' + userName, pass);
-        alert("הסיסמה נשמרה בהצלחה! כעת תוכל להתחבר.");
+        alert("הסיסמא נשמרה בהצלחה! כעת תוכל להתחבר.");
 
         document.getElementById('setupOverlay').style.display = 'none';
         populateUserDropdowns();
@@ -536,13 +531,13 @@
         const savedPassword = localStorage.getItem('pwd_' + userName);
 
         if (!savedPassword) {
-            alert("משתמש זה טרם הגדיר סיסמה. אנא הגדר סיסמה תחילה.");
+            alert("משתמש זה טרם הגדיר סיסמא. אנא הגדר סיסמא תחילה.");
             checkUserHasPassword(userName);
             return;
         }
 
         if (password !== savedPassword) {
-            alert("סיסמה שגויה!");
+            alert("סיסמא שגויה!");
             return;
         }
 
@@ -583,7 +578,7 @@
         const currentStoredPass = localStorage.getItem('pwd_' + currentUser.name);
 
         if (oldPass !== currentStoredPass) {
-            alert("הסיסמה הקודמת שהוזנה שגויה.");
+            alert("הסיסמא הקודמת שהוזנה שגויה.");
             return;
         }
 
@@ -593,12 +588,12 @@
         }
 
         if (newPass.length < 4) {
-            alert("הסיסמה חייבת להכיל לפחות 4 תווים.");
+            alert("הסיסמא חייבת להכיל לפחות 4 תווים.");
             return;
         }
 
         localStorage.setItem('pwd_' + currentUser.name, newPass);
-        alert("הסיסמה שונתה בהצלחה!");
+        alert("הסיסמא שונתה בהצלחה!");
         closeChangePassModal();
     }
 
@@ -699,7 +694,7 @@
         const personId = usersMap[personName];
 
         if (config.type === 'item' && !projectId) {
-            alert("אנא בחחר פרויקט תקין מהרשימה");
+            alert("אנא בחר פרויקט תקין מהרשימה");
             btn.disabled = false;
             btn.textContent = 'הוסף משימה';
             return;
@@ -764,7 +759,7 @@
             const result = await res.json();
 
             if (result.errors) {
-                console.error("שגיאה ממדני:", result.errors);
+                console.error("שגיאה ממאנדיי:", result.errors);
                 alert("שגיאה ממאנדיי: " + result.errors[0].message);
                 throw new Error(result.errors[0].message);
             }

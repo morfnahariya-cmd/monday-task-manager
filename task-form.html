@@ -101,7 +101,7 @@
             box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
         }
         
-        /* עיצוב בלוני Bubblegum תלת-ממדיים עם נגיעת כחול עדינה */
+        /* עיצוב בלוני Bubblegum תלת-ממדיים עם נגיעת כחול עדינה ומיקום מדויק לאיקס */
         .tags-input-container {
             border: 1px solid #c3c6d4;
             border-radius: 8px;
@@ -135,29 +135,28 @@
             margin-top: 8px;
             margin-right: 8px;
         }
-        /* מיקום האיקס כך שמרכזו יושב בדיוק על הקו העליון-ימני של הבועה (חצי בפנים וחצי בחוץ) */
         .tag-remove {
             position: absolute;
-            top: 0;
-            right: 0;
-            transform: translate(50%, -50%);
+            top: -6px;
+            right: -6px;
+            transform: none;
             background: transparent;
             color: #111111;
             border: none;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0;
             line-height: 1;
-            transition: transform 0.15s, color 0.15s;
-            z-index: 5;
+            transition: color 0.15s, transform 0.15s;
+            z-index: 10;
         }
         .tag-remove:hover {
             color: #e44332;
-            transform: translate(50%, -50%) scale(1.2);
+            transform: scale(1.2);
         }
         .tags-input-container input {
             border: none;

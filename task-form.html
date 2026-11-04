@@ -136,12 +136,12 @@
             margin-right: 10px;
             margin-left: 10px; 
         }
-        /* מיקום מושלם בפינה הימנית-עליונה בדיוק לפי הבקשה */
+        /* מיקום מדויק של מרכז האיקס בדיוק על הנקודה השחורה בפינה */
         .tag-remove {
             position: absolute;
-            top: -1px;
-            right: -4px;
-            transform: none;
+            top: 0;
+            right: 0;
+            transform: translate(50%, -65%);
             background: transparent;
             color: #111111;
             border: none;
@@ -160,7 +160,7 @@
         }
         .tag-remove:hover {
             color: #e44332;
-            transform: scale(1.2);
+            transform: translate(50%, -65%) scale(1.2);
         }
         .tags-input-container input {
             border: none;

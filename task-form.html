@@ -197,26 +197,36 @@
             height: 36px;
         }
 
+        /* עיצוב כפתור שליחה וכפתורים כלליים בסגנון Bubbly תלת-ממדי זכוכית */
         button[type="submit"], .action-btn {
             font-family: 'Rubik', sans-serif;
             width: 100%;
-            background-color: #0073ea;
+            background: linear-gradient(135deg, #1e90ff 0%, #0060b9 100%);
             color: white;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.4);
             padding: 14px;
-            border-radius: 8px;
+            border-radius: 25px;
             font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 16px rgba(0, 115, 234, 0.35),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.5),
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
             margin-top: 10px;
         }
         button[type="submit"]:hover, .action-btn:hover {
-            background-color: #0060b9;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(0, 115, 234, 0.45),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.6),
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.25);
         }
         button[type="submit"]:disabled {
-            background-color: #a0c4f1;
+            background: #a0c4f1;
+            box-shadow: none;
             cursor: not-allowed;
+            transform: none;
         }
         .message {
             margin-top: 15px;
@@ -413,7 +423,7 @@
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
                     <button type="submit" class="action-btn" style="order: 1;">אישור</button>
-                    <button type="button" class="action-btn" style="background-color: #6c757d; order: 2;" onclick="closeChangePassModal()">ביטול</button>
+                    <button type="button" class="action-btn" style="background: #6c757d; box-shadow: 0 6px 16px rgba(108, 117, 125, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.2); order: 2;" onclick="closeChangePassModal()">ביטול</button>
                 </div>
             </form>
         </div>

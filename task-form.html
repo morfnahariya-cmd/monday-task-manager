@@ -236,7 +236,7 @@
             position: relative;
         }
         
-        /* עיצוב הפס העליון */
+        /* עיצוב הפס העליון עם יישור אנכי מושלם (align-items: center) */
         .user-greeting {
             background: #e1f5fe;
             color: #01579b;
@@ -250,7 +250,7 @@
             align-items: center;
         }
 
-        /* כפתור שם המשתמש: מוקטן, גווני ירוק בהירים יותר עם גרדיאנט, אפקט זכוכית ותלת-ממד */
+        /* כפתור שם המשתמש: מוקטן, מיושר ומעוצב */
         .user-badge-btn {
             display: inline-flex;
             align-items: center;
@@ -268,7 +268,6 @@
                         inset 0 -2px 4px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(6px);
-            transform: translateY(-1px);
         }
 
         /* אנימציית העיגול הלבן (Pulse) */
@@ -427,27 +426,27 @@
     <div class="form-group">
         <label class="required" for="taskName">מה המשימה?</label>
         <div style="position: relative;">
-            <input type="text" id="taskName" required placeholder="הקלד/הקלט תיאור משימה..." style="padding-left: 40px;">
+            <input type="text" id="taskName" required placeholder="הקלד/הקלט תיאור משימה..." style="padding-left: 40px;" autocomplete="off" spellcheck="false">
             <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0;">🔊</button>
         </div>
     </div>
 
-        <!-- שם הפרויקט עם בלוני Bubblegum תלת-ממדיים -->
+        <!-- שם הפרויקט עם מניעת היסטוריה אוטומטית -->
         <div class="form-group">
             <label class="required" for="projectInput">שם הפרוייקט</label>
             <div class="tags-input-container" id="projectsTagsContainer" onclick="document.getElementById('projectInput').focus()">
-                <input type="text" id="projectInput" list="projectsList" placeholder="הקלד או בחר פרויקט...">
+                <input type="text" id="projectInput" list="projectsList" placeholder="הקלד או בחר פרויקט..." autocomplete="off" spellcheck="false">
             </div>
             <datalist id="projectsList">
                 <option value="טוען פרויקטים...">
             </datalist>
         </div>
 
-        <!-- אחראי/ת עם בלוני Bubblegum תלת-ממדיים -->
+        <!-- אחראי/ת עם מניעת היסטוריה אוטומטית -->
         <div class="form-group">
             <label for="personInput">באחריות</label>
             <div class="tags-input-container" id="personsTagsContainer" onclick="document.getElementById('personInput').focus()">
-                <input type="text" id="personInput" list="usersList2" placeholder="הקלד או בחר אחראי/ת...">
+                <input type="text" id="personInput" list="usersList2" placeholder="הקלד או בחר אחראי/ת..." autocomplete="off" spellcheck="false">
             </div>
             <datalist id="usersList2">
                 <option value="טוען משתמשים...">

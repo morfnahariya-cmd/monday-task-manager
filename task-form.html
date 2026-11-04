@@ -544,7 +544,8 @@
     };
 
     let currentBoardKey = 'permits';
-    let projectsMap = {}; 
+    let projectsMap = {}; // מיפוי שם הפרויקט ל-ID שלו
+    let projectSourceBoard = {}; // מיפוי חדש: שומר לאיזה לוח שייך כל פרויקט שנבחר
     let usersMap = {};     
     let currentUser = null;
     let allUsersList = [];
@@ -564,6 +565,7 @@
             const val = this.value.trim();
             if (projectsMap[val] && !selectedProjects.includes(val)) {
                 selectedProjects.push(val);
+                projectSourceBoard[val] = currentBoardKey; // שומר את הלוח הנוכחי שממנו נבחר הפרויקט
                 this.value = '';
                 renderProjectTags();
                 updateProjectsDatalist();
@@ -574,6 +576,7 @@
             const val = this.value.trim();
             if (val && !selectedProjects.includes(val)) {
                 selectedProjects.push(val);
+                projectSourceBoard[val] = currentBoardKey;
                 this.value = '';
                 renderProjectTags();
                 updateProjectsDatalist();
@@ -620,6 +623,7 @@
 
     function removeProject(proj) {
         selectedProjects = selectedProjects.filter(p => p !== proj);
+        delete projectSourceBoard[proj];
         renderProjectTags();
         updateProjectsDatalist();
     }
@@ -955,16 +959,18 @@
         btn.disabled = true;
         btn.textContent = 'שולח משימה...';
 
-        const config = BOARDS_CONFIG[currentBoardKey];
         const taskName = document.getElementById('taskName').value;
         const dueDate = document.getElementById('dueDate').value;
         const priority = document.getElementById('priority').value;
-
         const createdById = currentUser.id; 
 
         try {
+            // מעבר על כל הפרויקטים שנבחרו, ללא קשר ללוח שממנו נבחרו
             for (let projName of selectedProjects) {
-                const projectId = projectsMap[projName];
+                const sourceBoardKey = projectSourceBoard[projName] || currentBoardKey;
+                const config = BOARDS_CONFIG[sourceBoardKey];
+                const projectId = projectsMap[projName] || (window.allLoadedProjects && window.allLoadedProjects[projName]);
+                
                 const columnValues = {};
 
                 if (config.type === 'item') {
@@ -1034,13 +1040,14 @@
                 }
             }
 
-            msg.textContent = 'המשימות נוספו בהצלחה למאנדיי!';
+            msg.textContent = 'המשימות נוספו בהצלחה לכל הפרויקטים שנבחרו!';
             msg.className = 'message success';
             msg.style.display = 'block';
             
             document.getElementById('taskForm').reset();
             selectedProjects = [];
             selectedPersons = [];
+            projectSourceBoard = {};
             renderProjectTags();
             renderPersonTags();
             updateProjectsDatalist();

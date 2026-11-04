@@ -228,7 +228,7 @@
             position: relative;
         }
         
-        /* עיצוב הפס העליון עם כפתור ירוק ואנימציית Pulse בדומה ל"איפה רבי?" */
+        /* עיצוב הפס העליון עם הכפתורים בצד שמאל והכפתור הירוק עם אנימציית Pulse בצד ימין */
         .user-greeting {
             background: #e1f5fe;
             color: #01579b;
@@ -395,14 +395,14 @@
     </div>
 
 <div class="form-container">
-    <!-- פס עליון למשתמש המחובר בעיצוב הירוק והדינמי של "איפה רבי?" -->
+    <!-- פס עליון למשתמש המחובר עם כפתורים בשמאל וכפתור ירוק פועם מימין -->
     <div id="userGreetingBar" class="user-greeting" style="display:none;">
+        <div>
+            <button type="button" class="top-link-btn" onclick="openChangePassModal()">החלף סיסמא</button>|<button type="button" class="top-link-btn" onclick="handleLogout()">החלף משתמש</button>
+        </div>
         <div class="user-badge-btn">
             <span id="loggedInUserName"></span>
             <div class="pulse-dot"></div>
-        </div>
-        <div>
-            <button type="button" class="top-link-btn" onclick="openChangePassModal()">החלף סיסמא</button>|<button type="button" class="top-link-btn" onclick="handleLogout()">החלף משתמש</button>
         </div>
     </div>
 
@@ -655,7 +655,6 @@
                 currentUser = { name: savedUser, id: usersMap[savedUser] };
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('setupOverlay').style.display = 'none';
-                document.getElementById('loggedInUserNameLiveData').textContent = currentUser.name;
                 document.getElementById('loggedInUserName').textContent = currentUser.name;
                 document.getElementById('userGreetingBar').style.display = 'flex';
             } else {

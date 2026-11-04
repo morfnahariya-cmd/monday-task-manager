@@ -434,7 +434,7 @@
             <span id="loggedInUserName"></span>
         </div>
         <div>
-            <button type="button" class="top-link-btn" onclick="openChangePassModal()">החלף סיסמא</button>|<button type="button" class="top-link-btn" onclick="handleLogout()">יציאה</button>
+            <button type="button" class="top-link-btn" onclick="handleLogout()">יציאה</button>|<button type="button" class="top-link-btn" onclick="openChangePassModal()">החלף סיסמא</button>
         </div>
     </div>
 
@@ -1028,7 +1028,7 @@
             msg.className = 'message success';
             msg.style.display = 'block';
             
-            document.getElementById('taskForm'].reset();
+            document.getElementById('taskForm').reset();
             selectedProjects = [];
             selectedPersons = [];
             renderProjectTags();

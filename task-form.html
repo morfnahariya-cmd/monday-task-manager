@@ -227,6 +227,8 @@
             text-align: center;
             position: relative;
         }
+        
+        /* עיצוב הפס העליון עם כפתור ירוק ואנימציית Pulse בדומה ל"איפה רבי?" */
         .user-greeting {
             background: #e1f5fe;
             color: #01579b;
@@ -239,6 +241,47 @@
             justify-content: space-between;
             align-items: center;
         }
+
+        .user-badge-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #00875a 0%, #006644 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-family: 'Rubik', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(0, 135, 90, 0.3);
+            border: none;
+        }
+
+        /* עיגול לבן עם אנימציית התקרבות והתרחקות (Pulse) */
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+            animation: pulseAnim 1.6s infinite ease-in-out;
+        }
+
+        @keyframes pulseAnim {
+            0% {
+                transform: scale(0.8);
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            50% {
+                transform: scale(1.4);
+                box-shadow: 0 0 0 6px rgba(255, 255, 255, 0);
+            }
+            100% {
+                transform: scale(0.8);
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+
         .top-link-btn {
             background: none;
             border: none;
@@ -352,9 +395,12 @@
     </div>
 
 <div class="form-container">
-    <!-- פס עליון למשתמש המחובר - מעל הכותרת -->
+    <!-- פס עליון למשתמש המחובר בעיצוב הירוק והדינמי של "איפה רבי?" -->
     <div id="userGreetingBar" class="user-greeting" style="display:none;">
-        <span id="loggedInUserName">מחובר כ: </span>
+        <div class="user-badge-btn">
+            <span id="loggedInUserName"></span>
+            <div class="pulse-dot"></div>
+        </div>
         <div>
             <button type="button" class="top-link-btn" onclick="openChangePassModal()">החלף סיסמא</button>|<button type="button" class="top-link-btn" onclick="handleLogout()">החלף משתמש</button>
         </div>
@@ -609,7 +655,8 @@
                 currentUser = { name: savedUser, id: usersMap[savedUser] };
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('setupOverlay').style.display = 'none';
-                document.getElementById('loggedInUserName').textContent = `מחובר כ: ${currentUser.name}`;
+                document.getElementById('loggedInUserNameLiveData').textContent = currentUser.name;
+                document.getElementById('loggedInUserName').textContent = currentUser.name;
                 document.getElementById('userGreetingBar').style.display = 'flex';
             } else {
                 document.getElementById('loginOverlay').style.display = 'flex';
@@ -726,7 +773,7 @@
         localStorage.setItem('monday_portal_user', userName);
 
         document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('loggedInUserName').textContent = `מחובר כ: ${currentUser.name}`;
+        document.getElementById('loggedInUserName').textContent = currentUser.name;
         document.getElementById('userGreetingBar').style.display = 'flex';
     }
 

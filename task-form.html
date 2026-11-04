@@ -100,6 +100,60 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
         }
+        /* עיצוב אזור הבלונים (Tags) לפרויקטים ואחראים */
+        .tags-input-container {
+            border: 1px solid #c3c6d4;
+            border-radius: 8px;
+            padding: 8px;
+            background-color: #fff;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            min-height: 48px;
+            box-sizing: border-box;
+        }
+        .tags-input-container:focus-within {
+            border-color: #0073ea;
+            box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
+        }
+        .tag-badge {
+            background-color: #e1f5fe;
+            color: #01579b;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+        .tag-remove {
+            background: none;
+            border: none;
+            color: #01579b;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tag-remove:hover {
+            color: #d32f2f;
+        }
+        .tags-input-container input {
+            border: none;
+            padding: 4px;
+            flex: 1;
+            min-width: 120px;
+            outline: none;
+            box-shadow: none;
+            background: transparent;
+            font-size: 1rem;
+        }
+
         button[type="submit"], .action-btn {
             font-family: 'Rubik', sans-serif;
             width: 100%;
@@ -266,8 +320,8 @@
                     <input type="password" id="confirmPass" required placeholder="הקלד שוב סיסמא חדשה...">
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button type="submit" class="action-btn" style="order: 2;">אישור</button>
-                    <button type="button" class="action-btn" style="background-color: #6c757d; order: 1;" onclick="closeChangePassModal()">ביטול</button>
+                    <button type="submit" class="action-btn" style="order: 1;">אישור</button>
+                    <button type="button" class="action-btn" style="background-color: #6c757d; order: 2;" onclick="closeChangePassModal()">ביטול</button>
                 </div>
             </form>
         </div>
@@ -294,26 +348,30 @@
     <form id="taskForm">
         
     <div class="form-group">
-    <label class="required" for="taskName">מה המשימה?</label>
-    <div style="position: relative;">
-        <input type="text" id="taskName" required placeholder="הקלד/הקלט תיאור משימה..." style="padding-left: 40px;">
-        <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0;">🔊</button>
+        <label class="required" for="taskName">מה המשימה?</label>
+        <div style="position: relative;">
+            <input type="text" id="taskName" required placeholder="הקלד/הקלט תיאור משימה..." style="padding-left: 40px;">
+            <button type="button" id="micBtn" onclick="toggleSpeechRecognition()" title="הקלטה קולית" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0;">🔊</button>
+        </div>
     </div>
-</div>
 
-        <!-- שם הפרויקט עם חיפוש והקלדה -->
+        <!-- שם הפרויקט עם תמיכת בלונים מרובים -->
         <div class="form-group">
             <label class="required" for="projectInput">שם הפרוייקט</label>
-            <input type="text" id="projectInput" list="projectsList" required placeholder="הקלד או בחר פרויקט...">
+            <div class="tags-input-container" id="projectsTagsContainer" onclick="document.getElementById('projectInput').focus()">
+                <input type="text" id="projectInput" list="projectsList" placeholder="הקלד או בחר פרויקט...">
+            </div>
             <datalist id="projectsList">
                 <option value="טוען פרויקטים...">
             </datalist>
         </div>
 
-        <!-- אחראי/ת עם חיפוש והקלדה -->
+        <!-- אחראי/ת עם תמיכת בלונים מרובים -->
         <div class="form-group">
             <label for="personInput">באחריות</label>
-            <input type="text" id="personInput" list="usersList2" placeholder="הקלד או בחר אחראי/ת...">
+            <div class="tags-input-container" id="personsTagsContainer" onclick="document.getElementById('personInput').focus()">
+                <input type="text" id="personInput" list="usersList2" placeholder="הקלד או בחר אחראי/ת...">
+            </div>
             <datalist id="usersList2">
                 <option value="טוען משתמשים...">
             </datalist>
@@ -385,9 +443,82 @@
     let currentUser = null;
     let allUsersList = [];
 
+    // מערכים לשמירת הפרויקטים והאחראים הנבחרים (בלונים)
+    let selectedProjects = [];
+    let selectedPersons = [];
+
     window.addEventListener('DOMContentLoaded', () => {
         loadUsersForLoginAndPortal();
+        setupTagInputs();
     });
+
+    function setupTagInputs() {
+        const projInput = document.getElementById('projectInput');
+        projInput.addEventListener('change', function() {
+            const val = this.value.trim();
+            if (val && projectsMap[val] && !selectedProjects.includes(val)) {
+                selectedProjects.push(val);
+                this.value = '';
+                renderProjectTags();
+            } else if (val && !projectsMap[val]) {
+                // אם הקלידו שם שלא ברשימה אבל קיים בdatalist
+                if (!selectedProjects.includes(val)) {
+                    selectedProjects.push(val);
+                    this.value = '';
+                    renderProjectTags();
+                }
+            }
+        });
+
+        const persInput = document.getElementById('personInput');
+        persInput.addEventListener('change', function() {
+            const val = this.value.trim();
+            if (val && (usersMap[val] || allUsersList.some(u => u.name === val)) && !selectedPersons.includes(val)) {
+                selectedPersons.push(val);
+                this.value = '';
+                renderPersonTags();
+            }
+        });
+    }
+
+    function renderProjectTags() {
+        const container = document.getElementById('projectsTagsContainer');
+        const input = document.getElementById('projectInput');
+        
+        // מחיקת כל הבלונים הישנים
+        container.querySelectorAll('.tag-badge').forEach(el => el.remove());
+
+        selectedProjects.forEach(proj => {
+            const badge = document.createElement('div');
+            badge.className = 'tag-badge';
+            badge.innerHTML = `<span>${proj}</span><button type="button" class="tag-remove" onclick="removeProject('${proj}')">&times;</button>`;
+            container.insertBefore(badge, input);
+        });
+    }
+
+    function removeProject(proj) {
+        selectedProjects = selectedProjects.filter(p => p !== proj);
+        renderProjectTags();
+    }
+
+    function renderPersonTags() {
+        const container = document.getElementById('personsTagsContainer');
+        const input = document.getElementById('personInput');
+        
+        container.querySelectorAll('.tag-badge').forEach(el => el.remove());
+
+        selectedPersons.forEach(pers => {
+            const badge = document.createElement('div');
+            badge.className = 'tag-badge';
+            badge.innerHTML = `<span>${pers}</span><button type="button" class="tag-remove" onclick="removePerson('${pers}')">&times;</button>`;
+            container.insertBefore(badge, input);
+        });
+    }
+
+    function removePerson(pers) {
+        selectedPersons = selectedPersons.filter(p => p !== pers);
+        renderPersonTags();
+    }
 
     async function loadUsersForLoginAndPortal() {
         const query = `{ users(limit: 500) { id name } }`;
@@ -619,7 +750,6 @@
         const datalist = document.getElementById('projectsList');
         if (!input || !datalist) return;
         
-        input.value = '';
         datalist.innerHTML = '<option value="טוען פרויקטים...">';
         projectsMap = {};
         
@@ -675,6 +805,11 @@
             return;
         }
 
+        if (selectedProjects.length === 0) {
+            alert("אנא בחר לפחות פרויקט אחד מהרשימה");
+            return;
+        }
+
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('formMessage');
         
@@ -682,93 +817,95 @@
         btn.textContent = 'שולח משימה...';
 
         const config = BOARDS_CONFIG[currentBoardKey];
-
         const taskName = document.getElementById('taskName').value;
-        const projectName = document.getElementById('projectInput').value;
-        const personName = document.getElementById('personInput').value;
         const dueDate = document.getElementById('dueDate').value;
         const priority = document.getElementById('priority').value;
 
-        const projectId = projectsMap[projectName];
         const createdById = currentUser.id; 
-        const personId = usersMap[personName];
 
-        if (config.type === 'item' && !projectId) {
-            alert("אנא בחר פרויקט תקין מהרשימה");
-            btn.disabled = false;
-            btn.textContent = 'הוסף משימה';
-            return;
-        }
-
-        const columnValues = {};
-        
-        if (config.type === 'item') {
-            if (projectId) {
-                columnValues[config.projectColumnId] = { item_ids: [parseInt(projectId)] };
-            }
-        }
-
-        if (createdById && config.createdByCol) {
-            columnValues[config.createdByCol] = { personsAndTeams: [{ id: parseInt(createdById), kind: "person" }] };
-        }
-
-        if (personId) {
-            columnValues["person"] = { personsAndTeams: [{ id: parseInt(personId), kind: "person" }] };
-        }
-        if (dueDate) {
-            columnValues[config.dateCol] = { date: dueDate };
-        }
-        if (priority) {
-            columnValues[config.priorityCol] = { label: priority };
-        }
-
-        let query = '';
-
-        if (config.type === 'item') {
-            query = `mutation {
-                create_item (
-                    board_id: ${config.boardId},
-                    item_name: "${taskName.replace(/"/g, '\\"')}",
-                    column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
-                ) {
-                    id
-                }
-            }`;
-        } else {
-            query = `mutation {
-                create_subitem (
-                    parent_item_id: ${projectId},
-                    item_name: "${taskName.replace(/"/g, '\\"')}",
-                    column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
-                ) {
-                    id
-                }
-            }`;
-        }
-
+        // שליחת משימה לכל הפרויקטים שנבחרו בלולאה
         try {
-            const res = await fetch("https://api.monday.com/v2", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": MONDAY_API_KEY
-                },
-                body: JSON.stringify({ query })
-            });
+            for (let projName of selectedProjects) {
+                const projectId = projectsMap[projName];
+                const columnValues = {};
 
-            const result = await res.json();
+                if (config.type === 'item') {
+                    if (projectId) {
+                        columnValues[config.projectColumnId] = { item_ids: [parseInt(projectId)] };
+                    }
+                }
 
-            if (result.errors) {
-                console.error("שגיאה ממאנדיי:", result.errors);
-                alert("שגיאה ממאנדיי: " + result.errors[0].message);
-                throw new Error(result.errors[0].message);
+                if (createdById && config.createdByCol) {
+                    columnValues[config.createdByCol] = { personsAndTeams: [{ id: parseInt(createdById), kind: "person" }] };
+                }
+
+                // טיפול באחראים מרובים
+                if (selectedPersons.length > 0) {
+                    let personsTeams = selectedPersons.map(pName => {
+                        let pId = usersMap[pName];
+                        return pId ? { id: parseInt(pId), kind: "person" } : null;
+                    }).filter(Boolean);
+
+                    if (personsTeams.length > 0) {
+                        columnValues["person"] = { personsAndTeams: personsTeams };
+                    }
+                }
+
+                if (dueDate) {
+                    columnValues[config.dateCol] = { date: dueDate };
+                }
+                if (priority) {
+                    columnValues[config.priorityCol] = { label: priority };
+                }
+
+                let query = '';
+                if (config.type === 'item') {
+                    query = `mutation {
+                        create_item (
+                            board_id: ${config.boardId},
+                            item_name: "${taskName.replace(/"/g, '\\"')}",
+                            column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
+                        ) {
+                            id
+                        }
+                    }`;
+                } else {
+                    query = `mutation {
+                        create_subitem (
+                            parent_item_id: ${projectId},
+                            item_name: "${taskName.replace(/"/g, '\\"')}",
+                            column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
+                        ) {
+                            id
+                        }
+                    }`;
+                }
+
+                const res = await fetch("https://api.monday.com/v2", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": MONDAY_API_KEY
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                const result = await res.json();
+                if (result.errors) {
+                    console.error("שגיאה ממאנדיי:", result.errors);
+                    throw new Error(result.errors[0].message);
+                }
             }
 
-            msg.textContent = 'המשימה נוספה בהצלחה למאנדיי!';
+            msg.textContent = 'המשימות נוספו בהצלחה למאנדיי!';
             msg.className = 'message success';
             msg.style.display = 'block';
             
             document.getElementById('taskForm').reset();
+            selectedProjects = [];
+            selectedPersons = [];
+            renderProjectTags();
+            renderPersonTags();
             switchBoard(currentBoardKey);
         } catch (err) {
             msg.textContent = 'שגיאה בשליחת המשימה. נסה שוב.';

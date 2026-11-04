@@ -110,7 +110,7 @@
             box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
         }
         
-        /* עיצוב בלוני Bubblegum תלת-ממדיים מושלמים עם גובה קבוע וגלילה אופקית נקה */
+        /* עיצוב בלוני Bubblegum תלת-ממדיים עשירים עם גובה קבוע ושמירה על כל הגרפיקה המקורית */
         .tags-input-container {
             border: 1px solid #c3c6d4;
             border-radius: 8px;
@@ -136,34 +136,39 @@
             border-color: #0073ea;
             box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
         }
+        
+        /* בלוני Bubblegum תלת-ממדיים מלאים ומושלמים */
         .tag-badge {
             position: relative;
             display: inline-flex;
             align-items: center;
             background: linear-gradient(135deg, rgba(240, 248, 255, 0.98) 0%, rgba(225, 240, 255, 0.95) 100%);
             color: #01579b;
-            padding: 6px 14px 6px 26px; /* מרווח משמאל לאיקס שיושב מימין */
-            border-radius: 20px;
+            padding: 6px 28px 6px 12px;
+            border-radius: 22px;
             font-size: 0.9rem;
             font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0, 115, 234, 0.12), 
-                        inset 0 1px 2px rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 20px rgba(0, 115, 234, 0.15), 
+                        0 3px 6px rgba(0, 0, 0, 0.06),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.9),
+                        inset 0 -2px 4px rgba(0, 115, 234, 0.05);
             flex-shrink: 0;
         }
-        /* האיקס ממוקם במדויק בצד ימין של התגית */
+        
+        /* כפתור האיקס מעוצב וממוקם במדויק בצד ימין של הבלון */
         .tag-remove {
             position: absolute;
             right: 8px;
             top: 50%;
             transform: translateY(-50%);
             background: transparent;
-            color: #333333;
+            color: #111111;
             border: none;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: bold;
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -175,6 +180,7 @@
             color: #e44332;
             transform: translateY(-50%) scale(1.2);
         }
+
         .tags-input-container input {
             border: none;
             padding: 4px;
@@ -259,7 +265,7 @@
             box-sizing: border-box;
         }
 
-        /* כפתור שם המשתמש: מוקטן, מיושר ומעוצב */
+        /* כפתור שם המשתמש */
         .user-badge-btn {
             display: inline-flex;
             align-items: center;
@@ -440,7 +446,7 @@
         </div>
     </div>
 
-        <!-- שם הפרויקט עם תגיות Bubblegum מושלמות ואיקס מימין -->
+        <!-- שם הפרויקט עם בלוני Bubblegum תלת-ממדיים מושלמים -->
         <div class="form-group">
             <label class="required" for="projectInput">שם הפרוייקט</label>
             <div class="tags-input-container" id="projectsTagsContainer" onclick="document.getElementById('projectInput').focus()">

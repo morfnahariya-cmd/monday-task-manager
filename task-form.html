@@ -544,9 +544,13 @@
     };
 
     let currentBoardKey = 'permits';
-    let projectsMap = {};          // מיפוי של הפרויקטים בלוח הנוכחי
-    let globalProjectsMap = {};    // מאגר גלובלי ששומר את כל הפרויקטים מכל הלוחות שאליהם נכנסת
-    let projectSourceBoard = {};   // שומר לאיזה לוח שייך כל פרויקט שנבחר
+    let boardProjectsMaps = {   // שמירה נפרדת של רשימת הפרויקטים לכל לוח בפני עצמו
+        permits: {},
+        plans: {},
+        projects: {},
+        inspection: {}
+    };
+    let projectSourceBoard = {}; // זוכר בדיוק מאיזה לוח הגיע כל פרויקט שנבחר לבועה
     let usersMap = {};     
     let currentUser = null;
     let allUsersList = [];
@@ -564,9 +568,10 @@
         
         projInput.addEventListener('input', function() {
             const val = this.value.trim();
-            if ((projectsMap[val] || globalProjectsMap[val]) && !selectedProjects.includes(val)) {
+            const currentMap = boardProjectsMaps[currentBoardKey];
+            if (currentMap[val] && !selectedProjects.includes(val)) {
                 selectedProjects.push(val);
-                projectSourceBoard[val] = currentBoardKey;
+                projectSourceBoard[val] = currentBoardKey; // שומר את הלוח הנוכחי שממנו נבחר הפרויקט ספציפי
                 this.value = '';
                 renderProjectTags();
                 updateProjectsDatalist();
@@ -575,7 +580,8 @@
         });
         projInput.addEventListener('change', function() {
             const val = this.value.trim();
-            if (val && !selectedProjects.includes(val)) {
+            const currentMap = boardProjectsMaps[currentBoardKey];
+            if (currentMap[val] && !selectedProjects.includes(val)) {
                 selectedProjects.push(val);
                 projectSourceBoard[val] = currentBoardKey;
                 this.value = '';
@@ -652,9 +658,8 @@
     function updateProjectsDatalist() {
         const datalist = document.getElementById('projectsList');
         datalist.innerHTML = '';
-        // איחוד כל הפרויקטים מכל הלוחות שהוטענו עד כה להשלמה חלקה
-        const combinedMap = { ...globalProjectsMap, ...projectsMap };
-        Object.keys(combinedMap).forEach(projName => {
+        const currentMap = boardProjectsMaps[currentBoardKey];
+        Object.keys(currentMap).forEach(projName => {
             if (!selectedProjects.includes(projName)) {
                 let opt = document.createElement('option');
                 opt.value = projName;
@@ -898,8 +903,13 @@
         const datalist = document.getElementById('projectsList');
         if (!input || !datalist) return;
         
+        // אם הנתונים כבר קיימים בזיכרון ללוח הזה, נטענים מיד בלי קריאת שרת מיותרת
+        if (Object.keys(boardProjectsMaps[currentBoardKey]).length > 0) {
+            updateProjectsDatalist();
+            return;
+        }
+
         datalist.innerHTML = '<option value="טוען פרויקטים...">';
-        projectsMap = {};
         
         const config = BOARDS_CONFIG[currentBoardKey];
         const targetBoardId = config.type === 'item' ? config.projectsBoardId : config.boardId;
@@ -931,9 +941,9 @@
             const items = data.data.boards[0].items_page.items;
             items.sort((a, b) => a.name.localeCompare(b.name, 'he'));
 
+            boardProjectsMaps[currentBoardKey] = {};
             items.forEach(item => {
-                projectsMap[item.name] = item.id;
-                globalProjectsMap[item.name] = item.id; // שמירה במאגר הגלובלי למניעת איבוד פרויקטים מלוחות שונים
+                boardProjectsMaps[currentBoardKey][item.name] = item.id;
             });
 
             updateProjectsDatalist();
@@ -969,10 +979,11 @@
         const createdById = currentUser.id; 
 
         try {
+            // מעבר על כל הפרויקטים שנבחרו, שליפת הלוח המקורי שלהם וה-ID הנכון
             for (let projName of selectedProjects) {
                 const sourceBoardKey = projectSourceBoard[projName] || currentBoardKey;
                 const config = BOARDS_CONFIG[sourceBoardKey];
-                const projectId = projectsMap[projName] || globalProjectsMap[projName];
+                const projectId = boardProjectsMaps[sourceBoardKey][projName];
                 
                 const columnValues = {};
 

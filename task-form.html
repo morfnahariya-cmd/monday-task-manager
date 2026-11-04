@@ -544,8 +544,9 @@
     };
 
     let currentBoardKey = 'permits';
-    let projectsMap = {}; // מיפוי שם הפרויקט ל-ID שלו
-    let projectSourceBoard = {}; // מיפוי חדש: שומר לאיזה לוח שייך כל פרויקט שנבחר
+    let projectsMap = {};          // מיפוי של הפרויקטים בלוח הנוכחי
+    let globalProjectsMap = {};    // מאגר גלובלי ששומר את כל הפרויקטים מכל הלוחות שאליהם נכנסת
+    let projectSourceBoard = {};   // שומר לאיזה לוח שייך כל פרויקט שנבחר
     let usersMap = {};     
     let currentUser = null;
     let allUsersList = [];
@@ -563,9 +564,9 @@
         
         projInput.addEventListener('input', function() {
             const val = this.value.trim();
-            if (projectsMap[val] && !selectedProjects.includes(val)) {
+            if ((projectsMap[val] || globalProjectsMap[val]) && !selectedProjects.includes(val)) {
                 selectedProjects.push(val);
-                projectSourceBoard[val] = currentBoardKey; // שומר את הלוח הנוכחי שממנו נבחר הפרויקט
+                projectSourceBoard[val] = currentBoardKey;
                 this.value = '';
                 renderProjectTags();
                 updateProjectsDatalist();
@@ -651,7 +652,9 @@
     function updateProjectsDatalist() {
         const datalist = document.getElementById('projectsList');
         datalist.innerHTML = '';
-        Object.keys(projectsMap).forEach(projName => {
+        // איחוד כל הפרויקטים מכל הלוחות שהוטענו עד כה להשלמה חלקה
+        const combinedMap = { ...globalProjectsMap, ...projectsMap };
+        Object.keys(combinedMap).forEach(projName => {
             if (!selectedProjects.includes(projName)) {
                 let opt = document.createElement('option');
                 opt.value = projName;
@@ -930,6 +933,7 @@
 
             items.forEach(item => {
                 projectsMap[item.name] = item.id;
+                globalProjectsMap[item.name] = item.id; // שמירה במאגר הגלובלי למניעת איבוד פרויקטים מלוחות שונים
             });
 
             updateProjectsDatalist();
@@ -965,11 +969,10 @@
         const createdById = currentUser.id; 
 
         try {
-            // מעבר על כל הפרויקטים שנבחרו, ללא קשר ללוח שממנו נבחרו
             for (let projName of selectedProjects) {
                 const sourceBoardKey = projectSourceBoard[projName] || currentBoardKey;
                 const config = BOARDS_CONFIG[sourceBoardKey];
-                const projectId = projectsMap[projName] || (window.allLoadedProjects && window.allLoadedProjects[projName]);
+                const projectId = projectsMap[projName] || globalProjectsMap[projName];
                 
                 const columnValues = {};
 

@@ -101,7 +101,7 @@
             box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.15);
         }
         
-        /* עיצוב בלוני Bubblegum תלת-ממדיים עם נגיעת כחול עדינה ואיקס שיושב בול על קו המסגרת */
+        /* עיצוב בלוני Bubblegum תלת-ממדיים עם נגיעת כחול עדינה ואיקס שיושב בול חצי-חצי על השפה */
         .tags-input-container {
             border: 1px solid #c3c6d4;
             border-radius: 8px;
@@ -138,8 +138,8 @@
         .tag-remove {
             position: absolute;
             top: 0;
-            right: 0;
-            transform: translate(50%, -50%);
+            left: 100%;
+            transform: translate(-50%, -50%);
             background: transparent;
             color: #111111;
             border: none;
@@ -156,7 +156,7 @@
         }
         .tag-remove:hover {
             color: #e44332;
-            transform: translate(50%, -50%) scale(1.2);
+            transform: translate(-50%, -50%) scale(1.2);
         }
         .tags-input-container input {
             border: none;

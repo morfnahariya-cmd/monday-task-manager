@@ -424,7 +424,8 @@
                 document.getElementById('loggedInUserName').textContent = `מחובר כ: ${currentUser.name}`;
                 document.getElementById('userGreetingBar').style.display = 'flex';
             } else {
-                checkIfAnyUserNeedsSetup();
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('setupOverlay').style.display = 'none';
             }
         } catch (err) {
             console.error("שגיאה בטעינת משתמשים:", err);
@@ -442,13 +443,11 @@
         if (setupSelect) setupSelect.innerHTML = '<option value="">בחר שם משתמש...</option>';
         if (datalist2) datalist2.innerHTML = '';
 
-        let unassignedCount = 0;
-
         allUsersList.forEach(u => {
             const hasPassword = localStorage.getItem('pwd_' + u.name);
 
-            // הוספה לרשימת התחברות רק אם כבר יש לו סיסמה
-            if (hasPassword && loginSelect) {
+            // הוספה לרשימת התחברות (כל השמשתמשים מופיעים כאן)
+            if (loginSelect) {
                 let optLogin = document.createElement('option');
                 optLogin.value = u.name;
                 optLogin.textContent = u.name;
@@ -461,7 +460,6 @@
                 optSetup.value = u.name;
                 optSetup.textContent = u.name;
                 setupSelect.appendChild(optSetup);
-                unassignedCount++;
             }
 
             // שדה אחריות בטופס הראשי
@@ -471,34 +469,13 @@
                 datalist2.appendChild(opt2);
             }
         });
-
-        const setupLinkContainer = document.getElementById('setupLinkContainer');
-        if (setupLinkContainer) {
-            setupLinkContainer.style.display = unassignedCount > 0 ? 'block' : 'none';
-        }
-    }
-
-    function checkIfAnyUserNeedsSetup() {
-        // בדיקה האם יש לפחות משתמש אחד שטרם הגדיר סיסמה
-        let hasUnassigned = allUsersList.some(u => !localStorage.getItem('pwd_' + u.name));
-        let hasAssigned = allUsersList.some(u => localStorage.getItem('pwd_' + u.name));
-
-        populateUserDropdowns();
-
-        if (!hasAssigned && hasUnassigned) {
-            // אם אף אחד עוד לא הגדיר סיסמה, נפתח ישר את מסך ההגדרת סיסמה הראשונית
-            document.getElementById('setupOverlay').style.display = 'flex';
-            document.getElementById('loginOverlay').style.display = 'none';
-        } else {
-            document.getElementById('loginOverlay').style.display = 'flex';
-            document.getElementById('setupOverlay').style.display = 'none';
-        }
     }
 
     function checkUserHasPassword(userName) {
         if (!userName) return;
         const savedPassword = localStorage.getItem('pwd_' + userName);
         if (!savedPassword) {
+            // אם למשתמש הנבחר אין עדיין סיסמה, נעביר אותו למסך הגדרת סיסמה ראשונית
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('setupUserSelect').value = userName;
             document.getElementById('setupOverlay').style.display = 'flex';
@@ -513,7 +490,7 @@
 
     function closeSetupModal() {
         document.getElementById('setupOverlay').style.display = 'none';
-        checkIfAnyUserNeedsSetup();
+        document.getElementById('loginOverlay').style.display = 'flex';
     }
 
     function handleSetupPassword(e) {

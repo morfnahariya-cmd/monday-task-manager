@@ -181,28 +181,54 @@
 </head>
 <body>
 
-    <!-- מסך התחברות בכניסה -->
-    <div id="loginOverlay" class="modal-overlay">
+    <!-- מסך הגדרת סיסמה ראשונית (במידה והמשתמש טרם הגדיר) -->
+    <div id="setupOverlay" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <h2>הגדרת סיסמה ראשונית</h2>
+            <form onsubmit="handleSetupPassword(event)">
+                <div class="form-group" style="text-align: right;">
+                    <label class="required" for="setupUserSelect">שם משתמש</label>
+                    <select id="setupUserSelect" required>
+                        <option value="">טוען משתמשים...</option>
+                    </select>
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label class="required" for="setupPass">הגדרת סיסמה</label>
+                    <input type="password" id="setupPass" required placeholder="הזן סיסמה חדשה...">
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label class="required" for="setupConfirmPass">אימות סיסמה</label>
+                    <input type="password" id="setupConfirmPass" required placeholder="הזן שוב את הסיסמה...">
+                </div>
+                <button type="submit" class="action-btn">שמור סיסמה</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- מסך התחברות רגיל -->
+    <div id="loginOverlay" class="modal-overlay" style="display: none;">
         <div class="modal-box">
             <h2>התחברות לפורטל</h2>
-            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">בחר את שמך והזן סיסמה</p>
             <form onsubmit="handleLogin(event)">
                 <div class="form-group" style="text-align: right;">
-                    <label class="required" for="loginUserSelect">שם משתמש (מהמאנדיי)</label>
-                    <select id="loginUserSelect" required>
+                    <label class="required" for="loginUserSelect">שם משתמש</label>
+                    <select id="loginUserSelect" required onchange="checkUserHasPassword(this.value)">
                         <option value="">טוען משתמשים...</option>
                     </select>
                 </div>
                 <div class="form-group" style="text-align: right;">
                     <label class="required" for="loginPass">סיסמה</label>
-                    <input type="password" id="loginPass" required placeholder="הזן סיסמה (ברירת מחדל: nahariya123)">
+                    <input type="password" id="loginPass" required placeholder="הזן סיסמה...">
                 </div>
                 <button type="submit" class="action-btn">התחבר</button>
             </form>
+            <div style="margin-top: 15px;">
+                <button type="button" class="top-link-btn" onclick="switchToSetupModal()">עדיין לא הגדרת סיסמה? לחצי כאן</button>
+            </div>
         </div>
     </div>
 
-    <!-- חלון החלפת סיסמה -->
+    <!-- חלון להחלפת סיסמה -->
     <div id="changePassModal" class="modal-overlay" style="display: none;">
         <div class="modal-box">
             <h2>החלפת סיסמה</h2>
@@ -235,9 +261,7 @@
     </div>
 
 <div class="form-container">
-    <h2>הוספת משימה חדשה</h2>
-
-    <!-- פס עליון למשתמש המחובר -->
+    <!-- פס עליון למשתמש המחובר - מעל הכותרת -->
     <div id="userGreetingBar" class="user-greeting" style="display:none;">
         <span id="loggedInUserName">מחובר כ: </span>
         <div>
@@ -245,6 +269,8 @@
             <button type="button" class="top-link-btn" onclick="handleLogout()">החלף משתמש</button>
         </div>
     </div>
+
+    <h2>הוספת משימה חדשה</h2>
 
     <form id="taskForm">
         
@@ -339,13 +365,13 @@
     let usersMap = {};     
     let currentUser = null;
 
-    // הפעלת הטעינה המקורית בדיוק כפי שהייתה קיימת בקוד שעבד
     window.addEventListener('DOMContentLoaded', () => {
         loadUsersForLoginAndPortal();
     });
 
     async function loadUsersForLoginAndPortal() {
         const loginSelect = document.getElementById('loginUserSelect');
+        const setupSelect = document.getElementById('setupUserSelect');
         const datalist2 = document.getElementById('usersList2');
 
         const query = `{ users(limit: 500) { id name } }`;
@@ -365,7 +391,8 @@
                 const users = data.data.users;
                 users.sort((a, b) => a.name.localeCompare(b.name, 'he'));
 
-                if (loginSelect) loginSelect.innerHTML = '<option value="">בחר את שמך מהרשימה...</option>';
+                if (loginSelect) loginSelect.innerHTML = '<option value="">בחר שם משתמש...</option>';
+                if (setupSelect) setupSelect.innerHTML = '<option value="">בחר שם משתמש...</option>';
                 if (datalist2) datalist2.innerHTML = '';
                 usersMap = {};
 
@@ -379,6 +406,13 @@
                         loginSelect.appendChild(optLogin);
                     }
 
+                    if (setupSelect) {
+                        let optSetup = document.createElement('option');
+                        optSetup.value = u.name;
+                        optSetup.textContent = u.name;
+                        setupSelect.appendChild(optSetup);
+                    }
+
                     if (datalist2) {
                         let opt2 = document.createElement('option');
                         opt2.value = u.name;
@@ -387,21 +421,69 @@
                 });
             }
 
-            // בדיקה האם המשתמש כבר מחובר בדפדפן
+            // זכירת התחברות קבועה במכשיר
             const savedUser = localStorage.getItem('monday_portal_user');
             if (savedUser && usersMap[savedUser]) {
                 currentUser = { name: savedUser, id: usersMap[savedUser] };
                 document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('setupOverlay').style.display = 'none';
                 document.getElementById('loggedInUserName').textContent = `מחובר כ: ${currentUser.name}`;
                 document.getElementById('userGreetingBar').style.display = 'flex';
+            } else {
+                document.getElementById('loginOverlay').style.display = 'flex';
             }
         } catch (err) {
             console.error("Error loading users:", err);
             if (loginSelect) loginSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>';
         }
 
-        // טעינת הפרויקטים מיד לאחר השלמת טעינת המשתמשים
         loadProjectsForCurrentBoard();
+    }
+
+    function checkUserHasPassword(userName) {
+        if (!userName) return;
+        const savedPassword = localStorage.getItem('pwd_' + userName);
+        if (!savedPassword) {
+            // אם המשתמש טרם הגדיר סיסמה, נעביר אותו אוטומטית למסך הגדרת סיסמה ראשונית
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('setupUserSelect').value = userName;
+            document.getElementById('setupOverlay').style.display = 'flex';
+        }
+    }
+
+    function switchToSetupModal() {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('setupOverlay').style.display = 'flex';
+    }
+
+    function handleSetupPassword(e) {
+        e.preventDefault();
+        const userName = document.getElementById('setupUserSelect').value;
+        const pass = document.getElementById('setupPass').value;
+        const confirmPass = document.getElementById('setupConfirmPass').value;
+
+        if (!userName || !usersMap[userName]) {
+            alert("אנא בחר שם משתמש תקין");
+            return;
+        }
+
+        if (pass !== confirmPass) {
+            alert("הסיסמאות אינן תואמות");
+            return;
+        }
+
+        if (pass.length < 4) {
+            alert("הסיסמה חייבת להכיל לפחות 4 תווים");
+            return;
+        }
+
+        // שמירת הסיסמה האישית במכשיר
+        localStorage.setItem('pwd_' + userName, pass);
+        alert("הסיסמה נשמרה בהצלחה! כעת תוכלי להתחבר.");
+
+        document.getElementById('setupOverlay').style.display = 'none';
+        document.getElementById('loginUserSelect').value = userName;
+        document.getElementById('loginOverlay').style.display = 'flex';
     }
 
     function handleLogin(e) {
@@ -414,11 +496,16 @@
             return;
         }
 
-        const customPassKey = 'pwd_' + userName;
-        const savedPassword = localStorage.getItem(customPassKey) || 'nahariya123';
+        const savedPassword = localStorage.getItem('pwd_' + userName);
+
+        if (!savedPassword) {
+            alert("משתמש זה טרם הגדיר סיסמה. אנא הגדר סיסמה תחילה.");
+            checkUserHasPassword(userName);
+            return;
+        }
 
         if (password !== savedPassword) {
-            alert("סיסמה שגויה! (ברירת המחדל היא nahariya123)");
+            alert("סיסמה שגויה!");
             return;
         }
 
@@ -455,8 +542,7 @@
         const newPass = document.getElementById('newPass').value;
         const confirmPass = document.getElementById('confirmPass').value;
 
-        const customPassKey = 'pwd_' + currentUser.name;
-        const currentStoredPass = localStorage.getItem(customPassKey) || 'nahariya123';
+        const currentStoredPass = localStorage.getItem('pwd_' + currentUser.name);
 
         if (oldPass !== currentStoredPass) {
             alert("הסיסמה הקודמת שהוזנה שגויה.");
@@ -473,7 +559,7 @@
             return;
         }
 
-        localStorage.setItem(customPassKey, newPass);
+        localStorage.setItem('pwd_' + currentUser.name, newPass);
         alert("הסיסמה שונתה בהצלחה!");
         closeChangePassModal();
     }
@@ -570,9 +656,8 @@
         const dueDate = document.getElementById('dueDate').value;
         const priority = document.getElementById('priority').value;
 
-        // המרת שמות בחזרה ל-IDs של Monday באמצעות המיפויים המקוריים
         const projectId = projectsMap[projectName];
-        const createdById = currentUser.id; // המשתמש המחובר נשלח אוטומטית כמבקש המשימה
+        const createdById = currentUser.id; 
         const personId = usersMap[personName];
 
         if (config.type === 'item' && !projectId) {

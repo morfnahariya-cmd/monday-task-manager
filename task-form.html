@@ -250,7 +250,7 @@
             align-items: center;
         }
 
-        /* כפתור שם המשתמש: מוקטן, גווני ירוק בהירים יותר עם גרדיאנט ואפקט זכוכית ותלת-ממד */
+        /* כפתור שם המשתמש: מוקטן, גווני ירוק בהירים יותר עם גרדיאנט, אפקט זכוכית ותלת-ממד */
         .user-badge-btn {
             display: inline-flex;
             align-items: center;
@@ -409,7 +409,7 @@
     </div>
 
 <div class="form-container">
-    <!-- פס עליון עם כפתור מוקטן, מואר ומעוצב -->
+    <!-- פס עליון למשתמש המחובר -->
     <div id="userGreetingBar" class="user-greeting" style="display:none;">
         <div class="user-badge-btn">
             <div class="pulse-dot"></div>
@@ -1007,7 +1007,7 @@
             msg.className = 'message success';
             msg.style.display = 'block';
             
-            document.getElementById('taskForm'].reset();
+            document.getElementById('taskForm').reset();
             selectedProjects = [];
             selectedPersons = [];
             renderProjectTags();

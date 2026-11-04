@@ -136,12 +136,12 @@
             margin-right: 10px;
             margin-left: 10px; 
         }
-        /* האיקס יושב כעת בדיוק בפינה הימנית-עליונה (צפון-מזרח) על קו המסגרת */
+        /* מיקום מדויק של האיקס לפינה הימנית-עליונה של הבועה */
         .tag-remove {
             position: absolute;
-            top: 0;
-            right: 0;
-            transform: translate(50%, -50%);
+            top: 2px;
+            right: -4px;
+            transform: none;
             background: transparent;
             color: #111111;
             border: none;
@@ -160,7 +160,7 @@
         }
         .tag-remove:hover {
             color: #e44332;
-            transform: translate(50%, -50%) scale(1.2);
+            transform: scale(1.2);
         }
         .tags-input-container input {
             border: none;

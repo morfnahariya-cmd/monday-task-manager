@@ -132,17 +132,16 @@
                         0 3px 6px rgba(0, 0, 0, 0.06),
                         inset 0 1px 2px rgba(255, 255, 255, 0.9),
                         inset 0 -2px 4px rgba(0, 115, 234, 0.05);
-            margin-top: 8px;
-            margin-right: 8px;
-            /* מרווח קטן מימין כדי שהאיקס שיורד חצי החוצה לא ייחתך במסגרת הקונטיינר */
-            margin-left: 8px; 
+            margin-top: 10px;
+            margin-right: 10px;
+            margin-left: 10px; 
         }
-        /* האיקס יושב כעת בדיוק על קו המסגרת הימני של הבועה (חצי בפנים וחצי בחוץ) */
+        /* האיקס יושב כעת בדיוק בפינה הימנית-עליונה (צפון-מזרח) על קו המסגרת */
         .tag-remove {
             position: absolute;
-            top: 50%;
-            right: -6px;
-            transform: translateY(-50%);
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%);
             background: transparent;
             color: #111111;
             border: none;
@@ -161,7 +160,7 @@
         }
         .tag-remove:hover {
             color: #e44332;
-            transform: translateY(-50%) scale(1.2);
+            transform: translate(50%, -50%) scale(1.2);
         }
         .tags-input-container input {
             border: none;

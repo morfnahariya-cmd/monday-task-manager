@@ -437,7 +437,7 @@
     </div>
 
 <div class="form-container">
-    <!-- פס עליון למשתמש המחובר -->
+    <!-- פס עליון למשתמש המחובר (הוחזר למקומו!) -->
     <div id="userGreetingBar" class="user-greeting" style="display:none;">
         <div class="user-badge-btn">
             <div class="pulse-dot"></div>
@@ -1056,7 +1056,7 @@
             msg.className = 'message success';
             msg.style.display = 'block';
             
-            document.getElementById('taskForm'].reset();
+            document.getElementById('taskForm').reset();
             selectedProjects = [];
             selectedPersons = [];
             projectSourceBoard = {};
@@ -1085,7 +1085,6 @@
 
         const recognition = new SpeechRecognition();
         recognition.lang = 'he-IL';
-        // הוספת תוצאות ביניים כדי לזרז את התגובה במובייל
         recognition.interimResults = true;
         recognition.maxAlternatives = 1;
 

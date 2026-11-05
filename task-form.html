@@ -437,7 +437,7 @@
     </div>
 
 <div class="form-container">
-    <!-- פס עליון למשתמש המחובר (הוחזר למקומו!) -->
+    <!-- פס עליון למשתמש המחובר -->
     <div id="userGreetingBar" class="user-greeting" style="display:none;">
         <div class="user-badge-btn">
             <div class="pulse-dot"></div>
@@ -1076,6 +1076,8 @@
         }
     });
 
+    let speechTimeout = null;
+
     function toggleSpeechRecognition() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
@@ -1093,21 +1095,38 @@
 
         micBtn.innerText = "🔴";
 
+        // אם יש טיימר קודם, נאפס אותו
+        if (speechTimeout) {
+            clearTimeout(speechTimeout);
+        }
+
         recognition.onresult = function(event) {
             let transcript = '';
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 transcript += event.results[i][0].transcript;
             }
             taskInput.value = transcript;
+
+            // ברגע שהמשתמש מדבר, נאפס את הטיימר של ה-3.5 שניות של השקט
+            if (speechTimeout) {
+                clearTimeout(speechTimeout);
+            }
+            
+            // עצירה אוטומטית של ההקלטה 3.5 שניות אחרי שמפסיקים לדבר
+            speechTimeout = setTimeout(() => {
+                recognition.stop();
+            }, 3500);
         };
 
         recognition.onerror = function(event) {
             console.error("שגיאה בזיהוי קולי:", event.error);
             micBtn.innerText = "🔊";
+            if (speechTimeout) clearTimeout(speechTimeout);
         };
 
         recognition.onend = function() {
             micBtn.innerText = "🔊";
+            if (speechTimeout) clearTimeout(speechTimeout);
         };
 
         recognition.start();

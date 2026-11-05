@@ -544,13 +544,13 @@
     };
 
     let currentBoardKey = 'permits';
-    let boardProjectsMaps = {   // שמירה נפרדת של רשימת הפרויקטים לכל לוח בפני עצמו
+    let boardProjectsMaps = {   
         permits: {},
         plans: {},
         projects: {},
         inspection: {}
     };
-    let projectSourceBoard = {}; // זוכר בדיוק מאיזה לוח הגיע כל פרויקט שנבחר לבועה
+    let projectSourceBoard = {}; 
     let usersMap = {};     
     let currentUser = null;
     let allUsersList = [];
@@ -571,7 +571,7 @@
             const currentMap = boardProjectsMaps[currentBoardKey];
             if (currentMap[val] && !selectedProjects.includes(val)) {
                 selectedProjects.push(val);
-                projectSourceBoard[val] = currentBoardKey; // שומר את הלוח הנוכחי שממנו נבחר הפרויקט ספציפי
+                projectSourceBoard[val] = currentBoardKey; 
                 this.value = '';
                 renderProjectTags();
                 updateProjectsDatalist();
@@ -903,7 +903,6 @@
         const datalist = document.getElementById('projectsList');
         if (!input || !datalist) return;
         
-        // אם הנתונים כבר קיימים בזיכרון ללוח הזה, נטענים מיד בלי קריאת שרת מיותרת
         if (Object.keys(boardProjectsMaps[currentBoardKey]).length > 0) {
             updateProjectsDatalist();
             return;
@@ -979,7 +978,6 @@
         const createdById = currentUser.id; 
 
         try {
-            // מעבר על כל הפרויקטים שנבחרו, שליפת הלוח המקורי שלהם וה-ID הנכון
             for (let projName of selectedProjects) {
                 const sourceBoardKey = projectSourceBoard[projName] || currentBoardKey;
                 const config = BOARDS_CONFIG[sourceBoardKey];
@@ -1054,11 +1052,11 @@
                 }
             }
 
-            msg.textContent = 'המשימה נוספה בהצלחה!';
+            msg.textContent = 'המשימות נוספו בהצלחה לכל הפרויקטים שנבחרו!';
             msg.className = 'message success';
             msg.style.display = 'block';
             
-            document.getElementById('taskForm').reset();
+            document.getElementById('taskForm'].reset();
             selectedProjects = [];
             selectedPersons = [];
             projectSourceBoard = {};
@@ -1087,7 +1085,8 @@
 
         const recognition = new SpeechRecognition();
         recognition.lang = 'he-IL';
-        recognition.interimResults = false;
+        // הוספת תוצאות ביניים כדי לזרז את התגובה במובייל
+        recognition.interimResults = true;
         recognition.maxAlternatives = 1;
 
         const micBtn = document.getElementById('micBtn');
@@ -1096,9 +1095,11 @@
         micBtn.innerText = "🔴";
 
         recognition.onresult = function(event) {
-            const speechText = event.results[0][0].transcript;
-            taskInput.value = speechText;
-            micBtn.innerText = "🔊";
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+            }
+            taskInput.value = transcript;
         };
 
         recognition.onerror = function(event) {
